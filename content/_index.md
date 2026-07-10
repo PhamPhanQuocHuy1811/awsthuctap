@@ -19,7 +19,7 @@ chapter: false
 
 &emsp; **Email:** phamphanquochuy5150@gmail.com
 
-&emsp; **University:** Ho Chi Minh City University of Technology (HUTECH)
+&emsp; **University:** Ho Chi Minh City University of Technology (HUTECH)   
 
 &emsp; **Major:** Information Technology
 
@@ -31,7 +31,7 @@ chapter: false
 
 &emsp; **Internship Duration:** From 17/04/2026 to 10/7/2026
 
-![Your profile picture](![Avatar của Huy](/images/avatar.png))
+![Your profile picture](/awsthuctap/avatar.jpg)
 
 ### Report Content
 
