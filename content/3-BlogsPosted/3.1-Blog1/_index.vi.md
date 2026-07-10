@@ -6,7 +6,6 @@ chapter: false
 pre: " <b> 3.1. </b> "
 description: "Tìm hiểu cách Amazon Cognito tự động đồng bộ dữ liệu xác thực giữa các Region để đảm bảo ứng dụng không bị gián đoạn khi xảy ra sự cố hạ tầng."
 ---
-
 ---
 title: "Amazon Cognito Multi-Region Replication: Giải pháp High Availability"
 date: 2026-07-10

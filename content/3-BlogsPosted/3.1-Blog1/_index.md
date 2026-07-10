@@ -6,13 +6,6 @@ chapter: false
 pre: " <b> 3.1. </b> "
 description: "Learn how Amazon Cognito automatically synchronizes authentication data across multiple regions to ensure application continuity during infrastructure outrages."
 ---
----
-title: "Amazon Cognito Multi-Region Replication: High Availability Solution"
-date: 2026-07-10
-weight: 3
-draft: false
-description: "Learn how Amazon Cognito automatically synchronizes authentication data across multiple regions to ensure application continuity during infrastructure outrages."
----
 
 When building applications on AWS, we often focus on scaling systems, optimizing performance, or securing data. However, there is an undesirable yet inevitable scenario we must prepare for: **What happens if the AWS Region running our application goes down?**
 
