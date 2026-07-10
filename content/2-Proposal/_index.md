@@ -5,111 +5,170 @@ weight: 2
 chapter: false
 pre: " <b> 2. </b> "
 ---
-{{% notice warning %}}
-⚠️ **Note:** The information below is for reference purposes only. Please **do not copy verbatim** for your report, including this warning.
-{{% /notice %}}
 
-In this section, you need to summarize the contents of the workshop that you **plan** to conduct.
-
-# IoT Weather Platform for Lab Research
-## A Unified AWS Serverless Solution for Real-Time Weather Monitoring
+# Cloud-based Digital Product Marketplace with 3D Preview
+## DaiMarket / AWS Marketplace DaiAI — A digital-product marketplace with integrated 3D preview, real-time payment, and AWS-based storage
 
 ### 1. Executive Summary
-The IoT Weather Platform is designed for the ITea Lab team in Ho Chi Minh City to enhance weather data collection and analysis. It supports up to 5 weather stations, with potential scalability to 10-15, utilizing Raspberry Pi edge devices with ESP32 sensors to transmit data via MQTT. The platform leverages AWS Serverless services to deliver real-time monitoring, predictive analytics, and cost efficiency, with access restricted to 5 lab members via Amazon Cognito.
+*About the project* <br>
+**DaiMarket / AWS Marketplace DaiAI** is a digital-product marketplace focused on resources such as PDF/Word documents, templates, ebooks, 3D models, and design assets. The system allows users to register, log in, search products, view details, preview selected content, make payments, and access purchased products after the order is confirmed successfully.
+
+The key feature of the project is an integrated 3D preview experience directly in the browser. For 3D products, buyers can inspect the model before purchasing; for documents, the system supports a limited preview so buyers can evaluate the content before deciding to pay.
+
+In terms of deployment, the Frontend uses React + Vite and is currently deployed on Vercel to get a stable HTTPS URL. The Node.js + Express Backend runs on Amazon EC2 with PM2 and connects to Amazon RDS PostgreSQL through Prisma 7. Product files, thumbnails, and preview models are stored on Amazon S3 under the `products/` prefix, while EC2 accesses S3 through an IAM Role following the least-privilege principle.
+
+*Project objectives*
+<br>&emsp;- Apply the AWS knowledge learned to a real web application with a complete frontend, backend, database, and file storage.
+<br>&emsp;- Separate compute and storage: EC2 handles business logic, RDS stores relational data, S3 stores product assets.
+<br>&emsp;- Build the marketplace flows: buyer, seller/admin, product management, order, library, and payment webhook.
+<br>&emsp;- Experiment with access security using JWT, IAM Role, and backend authorization before allowing product file downloads.
+<br>&emsp;- Create a foundation that can expand to CloudFront, Route 53, CloudWatch, CI/CD, and monitoring in a later phase.
+
 
 ### 2. Problem Statement
-### What’s the Problem?
-Current weather stations require manual data collection, becoming unmanageable with multiple units. There is no centralized system for real-time data or analytics, and third-party platforms are costly and overly complex.
+*Current problem*
 
-### The Solution
-The platform uses AWS IoT Core to ingest MQTT data, AWS Lambda and API Gateway for processing, Amazon S3 for storage (including a data lake), and AWS Glue Crawlers and ETL jobs to extract, transform, and load data from the S3 data lake to another S3 bucket for analysis. AWS Amplify with Next.js provides the web interface, and Amazon Cognito ensures secure access. Similar to Thingsboard and CoreIoT, users can register new devices and manage connections, though this platform operates on a smaller scale and is designed for private use. Key features include real-time dashboards, trend analysis, and low operational costs.
+Digital-product marketplaces often face three main groups of problems: a preview experience that is not visual enough, file storage on the application server that is hard to scale, and a manual payment verification process that is slow. For products such as 3D models, if buyers can only look at a cover image or a text description, it is very hard to properly assess product quality.
 
-### Benefits and Return on Investment
-The solution establishes a foundational resource for lab members to develop a larger IoT platform, serving as a study resource, and provides a data foundation for AI enthusiasts for model training or analysis. It reduces manual reporting for each station via a centralized platform, simplifying management and maintenance, and improves data reliability. Monthly costs are $0.66 USD per the AWS Pricing Calculator, with a 12-month total of $7.92 USD. All IoT equipment costs are covered by the existing weather station setup, eliminating additional development expenses. The break-even period of 6-12 months is achieved through significant time savings from reduced manual work.
+If product files are stored directly on the backend server's disk, the system depends on EC2 capacity, is hard to back up, hard to scale, and risks losing files when deploying or changing source code. In practice, during trial deployment, storing files at `backend/storage/products` caused risks when git pull/stash created a mismatch between database metadata and the physical files.
+
+In addition, a manual payment process does not suit the marketplace model. The system needs a mechanism that automatically receives transaction webhooks, reconciles order codes, updates order status, and grants file access to the buyer after a successful payment.
+
+*Proposed solution*
+<br>&emsp;- The React/Vite Frontend provides the digital-product marketplace UI, 3D Viewer, admin pages, and personal library.
+<br>&emsp;- The Node.js/Express Backend handles the API, JWT authentication, authorization, product upload, orders, webhooks, and product ownership checks.
+<br>&emsp;- Amazon RDS PostgreSQL stores users, roles, categories, product metadata, orders, order items, payment methods, and transaction status.
+<br>&emsp;- Amazon S3 stores product files, thumbnails, and preview models; the backend uploads/streams files from S3 instead of storing them long-term on EC2.
+<br>&emsp;- EC2 accesses S3 through the IAM Role `marketplace-ec2-s3-role`, with no hardcoded access keys in the source code.
+<br>&emsp;- The SePay webhook automatically updates orders when a transaction notification is received.
+
 
 ### 3. Solution Architecture
-The platform employs a serverless AWS architecture to manage data from 5 Raspberry Pi-based stations, scalable to 15. Data is ingested via AWS IoT Core, stored in an S3 data lake, and processed by AWS Glue Crawlers and ETL jobs to transform and load it into another S3 bucket for analysis. Lambda and API Gateway handle additional processing, while Amplify with Next.js hosts the dashboard, secured by Cognito. The architecture is detailed below:
+The architecture is designed with clearly separated layers: the UI layer, API layer, relational data layer, object storage layer, and the security/permission management layer. In the current deployment, the frontend is hosted on Vercel; the target design can replace or complement it with CloudFront once the AWS account is verified and ready to use a CDN.
 
-![IoT Weather Station Architecture](/images/2-Proposal/edge_architecture.jpeg)
+<!--
+{{% notice warning %}}
+**Figure 2.1 not available yet** — DaiMarket AWS architecture diagram: shows Vercel or CloudFront for the frontend, EC2 backend, RDS PostgreSQL, S3 product assets, IAM Role, CloudWatch, and the SePay webhook. Purpose: gives the reader a full picture of the system components and the data flows between them.
+{{% /notice %}}
+-->
+![project architecture](../images/5-Workshop/5.1-workshop-overview/project_architecture.png)
 
-![IoT Weather Platform Architecture](/images/2-Proposal/platform_architecture.jpeg)
+Overall system flow: users access the frontend; the frontend calls the API via `/api`; requests are forwarded to the EC2 backend; the backend handles business logic, queries RDS, and uploads or streams files from S3; when a payment occurs, SePay sends a webhook so the backend can confirm and update the order status.
 
-### AWS Services Used
-- **AWS IoT Core**: Ingests MQTT data from 5 stations, scalable to 15.
-- **AWS Lambda**: Processes data and triggers Glue jobs (two functions).
-- **Amazon API Gateway**: Facilitates web app communication.
-- **Amazon S3**: Stores raw data in a data lake and processed outputs (two buckets).
-- **AWS Glue**: Crawlers catalog data, and ETL jobs transform and load it.
-- **AWS Amplify**: Hosts the Next.js web interface.
-- **Amazon Cognito**: Secures access for lab users.
+***Deployed components***
 
-### Component Design
-- **Edge Devices**: Raspberry Pi collects and filters sensor data, sending it to IoT Core.
-- **Data Ingestion**: AWS IoT Core receives MQTT messages from the edge devices.
-- **Data Storage**: Raw data is stored in an S3 data lake; processed data is stored in another S3 bucket.
-- **Data Processing**: AWS Glue Crawlers catalog the data, and ETL jobs transform it for analysis.
-- **Web Interface**: AWS Amplify hosts a Next.js app for real-time dashboards and analytics.
-- **User Management**: Amazon Cognito manages user access, allowing up to 5 active accounts.
+Component | Current implementation | Role in the system
+|---|---|---|
+|Frontend | React + Vite deployed on Vercel | Provides the user interface, product listing, admin dashboard, 3D viewer, and library.|
+|Backend API | Node.js + Express on Amazon EC2, managed by PM2 | Handles the REST API, auth, roles, products, orders, the SePay webhook, and S3 streaming.|
+|Database | Amazon RDS PostgreSQL | Stores relational data: users, roles, categories, product metadata, orders, payments.|
+|Product Storage | Amazon S3 bucket `marketplace-frontend-thao`, prefix `products/` | Stores product files, thumbnails, preview models; the backend accesses it via IAM Role.|
+|IAM | `marketplace-ec2-s3-role` | Grants PutObject/GetObject/DeleteObject/ListBucket permissions limited to the `products/` prefix.|
+|Payment | SePay webhook | Receives transaction notifications, reconciles the order code, and updates the order to SUCCESS.|
+|Monitoring | PM2 logs, AWS Budget; CloudWatch as a future extension | Tracks backend errors and costs; can expand to logs/alarms.|
+
+<!--
+{{% notice note %}}
+**Notes on target architecture vs. actual implementation**
+<br>&emsp;- The target diagram includes Route 53, ACM, CloudFront, and WAF. These components suit production, but not all of them are deployed in the current demo.
+<br>&emsp;- Vercel currently replaces the frontend hosting/CDN role during the demo phase because CloudFront is blocked by the AWS account verification step.
+<br>&emsp;- S3 has been repurposed correctly for product asset storage. The bucket should remain private; users must not read objects directly without the backend checking permissions first.
+<br>&emsp;- The backend currently streams files from S3 to the client after verifying ownership. A later phase can switch to presigned URLs to reduce the load on EC2.
+{{% /notice %}}
+-->
 
 ### 4. Technical Implementation
-**Implementation Phases**
-This project has two parts—setting up weather edge stations and building the weather platform—each following 4 phases:
-- Build Theory and Draw Architecture: Research Raspberry Pi setup with ESP32 sensors and design the AWS serverless architecture (1 month pre-internship)
-- Calculate Price and Check Practicality: Use AWS Pricing Calculator to estimate costs and adjust if needed (Month 1).
-- Fix Architecture for Cost or Solution Fit: Tweak the design (e.g., optimize Lambda with Next.js) to stay cost-effective and usable (Month 2).
-- Develop, Test, and Deploy: Code the Raspberry Pi setup, AWS services with CDK/SDK, and Next.js app, then test and release to production (Months 2-3).
+*4.1. Backend and database*
+<br>&emsp;- The Node.js + Express backend is deployed on EC2 Ubuntu and managed by PM2.
+<br>&emsp;- Prisma 7 connects to RDS PostgreSQL through `@prisma/adapter-pg`.
+<br>&emsp;- The RDS connection error through Node/Prisma was resolved by configuring SSL in the Prisma adapter.
+<br>&emsp;- The required seed uses upsert to create the admin/buyer/seller roles, payment methods, and categories without deleting real data.
+<br>&emsp;- The main APIs include auth, admin, products, categories, seller applications, orders, webhook, withdrawals, and library.
 
-**Technical Requirements**
-- Weather Edge Station: Sensors (temperature, humidity, rainfall, wind speed), a microcontroller (ESP32), and a Raspberry Pi as the edge device. Raspberry Pi runs Raspbian, handles Docker for filtering, and sends 1 MB/day per station via MQTT over Wi-Fi.
-- Weather Platform: Practical knowledge of AWS Amplify (hosting Next.js), Lambda (minimal use due to Next.js), AWS Glue (ETL), S3 (two buckets), IoT Core (gateway and rules), and Cognito (5 users). Use AWS CDK/SDK to code interactions (e.g., IoT Core rules to S3). Next.js reduces Lambda workload for the fullstack web app.
+*4.2. Product storage on Amazon S3*
+<br>&emsp;- Initially product files were stored in `backend/storage/products` on EC2, but this approach was unstable across deployments and unsuitable for scaling.
+<br>&emsp;- The backend switched to `multer.memoryStorage` to receive files temporarily in RAM, then uploads the buffer to S3 using the AWS SDK.
+<br>&emsp;- The database stores `fileUrl` as a filename and `storageKey` as `products/<uuid>.<ext>` to retrieve files from S3.
+<br>&emsp;- When a user views a thumbnail, previews a model, or downloads a file in the library, the backend fetches the object from S3 and streams it to the browser.
+<br>&emsp;- EC2 has the IAM Role `marketplace-ec2-s3-role` attached, and PutObject, ListObject, and DeleteObject were successfully tested with the S3 `products/` prefix.
+
+*4.3. Frontend and routing*
+<br>&emsp;- The React/Vite frontend is deployed on Vercel.
+<br>&emsp;- SPA routing is handled by rewrites so routes such as `/login`, `/register`, and `/products` can be accessed directly.
+<br>&emsp;- Vercel rewrites `/api/*` to the EC2 backend to avoid mixed-content errors and let the frontend call the API by relative path.
+<br>&emsp;- Hardcoded localhost URLs in the frontend API code were reviewed and fixed to `/api/...` to fit the deployed environment.
+
+*4.4. Payment and post-purchase access*
+<br>&emsp;- Orders are created in PENDING status after the buyer checks out.
+<br>&emsp;- The SePay webhook receives the transfer message, extracts the `DAIMxxxxxxxx` order code, finds the matching order, and updates PENDING to SUCCESS.
+<br>&emsp;- The library only displays/downloads products when the user has a SUCCESS order containing that product.
+<br>&emsp;- Downloads and previews go through the backend to verify the JWT and product ownership before streaming files from S3.
+
 
 ### 5. Timeline & Milestones
-**Project Timeline**
-- Pre-Internship (Month 0): 1 month for planning and old station review.
-- Internship (Months 1-3): 3 months.
-    - Month 1: Study AWS and upgrade hardware.
-    - Month 2: Design and adjust architecture.
-    - Month 3: Implement, test, and launch.
-- Post-Launch: Up to 1 year for research.
+Milestone | Main work | Result
+|---|---|---|
+|Phase 1 | Study EC2, S3, IAM, AWS Budget; define the digital-product marketplace topic. | Identified the required AWS services and the MVP scope.|
+|Phase 2 | Initialize React/Vite + Node.js/Express + Prisma/PostgreSQL; build the database schema. | Foundation for auth, product, category, order.|
+|Phase 3 | Develop the frontend, 3D viewer, admin dashboard, search, product detail, SePay flow. | Core business features completed.|
+|Phase 4 | Deploy the backend to EC2, connect RDS, fix Prisma/RDS SSL issues, seed required data. | Public API working, cloud database running stably.|
+|Phase 5 | Deploy the frontend to Vercel, fix SPA routing/API rewrites, migrate product storage to S3. | MVP deployed successfully: Vercel + EC2 + RDS + S3 + IAM Role.|
+|Next phase | Complete CloudFront/Route 53/ACM, CloudWatch monitoring, CI/CD, and presigned URLs. | Closer to the production architecture.|
+
 
 ### 6. Budget Estimation
-You can find the budget estimation on the [AWS Pricing Calculator](https://calculator.aws/#/estimate?id=621f38b12a1ef026842ba2ddfe46ff936ed4ab01).  
-Or you can download the [Budget Estimation File](../attachments/budget_estimation.pdf).
+The infrastructure is designed for a low-cost learning/demo environment. The final numbers will be updated using AWS Billing or the AWS Pricing Calculator at submission time, because pricing depends on the region, instance type, runtime, storage volume, and data transfer.
 
-### Infrastructure Costs
-- AWS Services:
-    - AWS Lambda: $0.00/month (1,000 requests, 512 MB storage).
-    - S3 Standard: $0.15/month (6 GB, 2,100 requests, 1 GB scanned).
-    - Data Transfer: $0.02/month (1 GB inbound, 1 GB outbound).
-    - AWS Amplify: $0.35/month (256 MB, 500 ms requests).
-    - Amazon API Gateway: $0.01/month (2,000 requests).
-    - AWS Glue ETL Jobs: $0.02/month (2 DPUs).
-    - AWS Glue Crawlers: $0.07/month (1 crawler).
-    - MQTT (IoT Core): $0.08/month (5 devices, 45,000 messages).
+<!--
+{{% notice warning %}}
+**Figure 2.2 not available yet** — Screenshot of AWS Billing/Budget or the AWS Pricing Calculator showing the estimated monthly cost for EC2, RDS, S3, and data transfer. Purpose: serves as evidence of the actual budget figures instead of theoretical estimates.
+{{% /notice %}}
+-->
 
-Total: $0.7/month, $8.40/12 months
+Service | Configuration/Usage scope | Status | Estimate
+|---|---|---|---|
+|Amazon EC2 | 1 Ubuntu instance running the Node.js backend with PM2 | In use | ~7.59$/month |
+|Amazon RDS PostgreSQL | Single-AZ, db.t4g.micro, 20 GiB gp3 | In use | > ~12$/month |
+|Amazon S3 | Bucket `marketplace-frontend-thao`, prefix `products/` for product assets | In use | ~0.18$/month |
+|IAM Role/Policy | `marketplace-ec2-s3-role` | In use | No separate charge.|
+|Vercel | frontend hosting | In use | Free |
+|AWS Budget | Cost/log monitoring | Partial | AWS Budget has no base charge|
 
-- Hardware: $265 one-time (Raspberry Pi 5 and sensors).
 
 ### 7. Risk Assessment
-#### Risk Matrix
-- Network Outages: Medium impact, medium probability.
-- Sensor Failures: High impact, low probability.
-- Cost Overruns: Medium impact, low probability.
+Risk | Impact | Probability | Mitigation strategy
+|---|---|---|---|
+|CloudFront/Route 53 unavailable due to AWS account verification | Medium | Medium | Use Vercel as temporary frontend hosting; keep CloudFront as the later production option.|
+|Prisma/RDS connection error due to SSL | High | Already occurred | Configure SSL in the Prisma adapter; test with the pg driver and the Prisma runtime before running the seed.|
+|DB metadata out of sync with local files on EC2 | High | Already occurred | Migrate product storage to S3; avoid depending on `backend/storage/products`.|
+|Wrong S3 permissions causing upload/download failures | High | Medium | Use an IAM Role for EC2; limit the policy to the `products/` prefix and test Put/Get/Delete.|
+|Deleting a product that has orders causes foreign key errors | Medium | Medium | Do not hard-delete products with orders; propose soft delete/isActive in a later phase.|
+|Payment/webhook status mismatch | High | Medium | Use the DAIM order code + idempotency; check the order status and log webhooks.|
+|Cloud cost overrun during the demo phase | Medium | Low-Medium | Enable budget alerts, use Single-AZ, turn off unneeded services, avoid NAT/ALB/WAF until required.|
 
-#### Mitigation Strategies
-- Network: Local storage on Raspberry Pi with Docker.
-- Sensors: Regular checks and spares.
-- Cost: AWS budget alerts and optimization.
-
-#### Contingency Plans
-- Revert to manual methods if AWS fails.
-- Use CloudFormation for cost-related rollbacks.
 
 ### 8. Expected Outcomes
-#### Technical Improvements: 
-Real-time data and analytics replace manual processes.  
-Scalable to 10-15 stations.
-#### Long-term Value
-1-year data foundation for AI research.  
-Reusable for future projects.
+- Complete a digital-product marketplace MVP including login/register, search, product detail, 3D preview, admin product/category management, orders, and library.
+- The backend runs stably on Amazon EC2 and connects to Amazon RDS PostgreSQL for relational data.
+- Product files, thumbnails, and preview models are stored on Amazon S3 instead of the EC2 local disk.
+- Users can only view/download files after the backend verifies the JWT and product ownership.
+- The SePay webhook automatically updates the payment status from PENDING to SUCCESS.
+- The project has a clear architecture diagram covering compute, storage, database, IAM, and payment integration.
+- Forms the basis for expanding to seller approval, soft-delete products, CloudFront/Route 53/ACM, CloudWatch logging, CI/CD, and presigned URLs.
+
+<!--
+### 9. List of figures/evidence to be added
+{{% notice info %}}
+The figures below are **not available yet** and will be inserted into the report once captured/drawn. The table describes exactly what each figure must show.
+{{% /notice %}}
+
+Figure | Name/evidence | Content to show
+|---|---|---|
+|Figure 2.1 | DaiMarket AWS architecture diagram | Vercel or CloudFront, EC2 backend, RDS, S3 product assets, IAM Role, SePay webhook.|
+|Figure 2.2 | AWS Billing/Budget or Pricing Calculator | Estimated monthly cost for EC2, RDS, S3, and data transfer.|
+|Figure 2.3 | EC2 IAM Role | Backend instance with the IAM Role `marketplace-ec2-s3-role` attached.|
+|Figure 2.4 | S3 bucket `products/` | New objects appearing after the admin uploads a product.|
+|Figure 2.5 | API health/products/categories | curl or browser returning a successful response.|
+|Figure 2.6 | Frontend demo | Home/search/product detail/library/admin pages working on Vercel.|
+|Figure 2.7 | SePay webhook/order status | Webhook receiving the request and the order switching to SUCCESS with a valid test transaction.|
+-->
