@@ -31,7 +31,7 @@ chapter: false
 
 &emsp; **Internship Duration:** From 17/04/2026 to 10/7/2026
 
-![Your profile picture](avatar.png)
+![Your profile picture](![Avatar của Huy](/images/avatar.png))
 
 ### Report Content
 
