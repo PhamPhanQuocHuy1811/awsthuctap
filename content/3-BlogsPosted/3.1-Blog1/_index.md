@@ -93,4 +93,4 @@ However, for systems requiring strict High Availability—such as *E-commerce pl
 
 What I love about this release is that AWS is sticking to its recent philosophy: **Turning complex infrastructure bottlenecks into out-of-the-box features.** This relieves engineers from maintaining brittle custom synchronization code, letting them focus entirely on product optimization and end-user experience.
 
-Link bài viết gốc:https://aws.amazon.com/vi/blogs/aws/improve-your-application-resilience-with-amazon-cognito-multi-region-replication/
+Original Source: https://aws.amazon.com/vi/blogs/aws/improve-your-application-resilience-with-amazon-cognito-multi-region-replication/

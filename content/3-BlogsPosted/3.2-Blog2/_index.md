@@ -1,31 +1,73 @@
 ---
 title: "Blog 2"
-date: 2024-01-01
-weight: 1
+date: 2026-07-10
+weight: 2
 chapter: false
 pre: " <b> 3.2. </b> "
+description: "AWS Weekly Summary: Claude Opus 4.8, Aurora MySQL + Kiro, AWS Transform, and key updates."
 ---
-{{% notice warning %}}
-⚠️ **Note:** The information below is for reference purposes only. Please **do not copy verbatim** for your report, including this warning.
-{{% /notice %}}
 
-# SESSION POLICIES IN AMAZON EKS POD IDENTITY
+# AWS Weekly Highlights: Claude Opus 4.8, Aurora MySQL + Kiro, AWS Transform, and More
 
-Amazon EKS Pod Identity has recently added the session policies feature, allowing you to narrow IAM permissions flexibly and precisely for each pod without needing to create many separate IAM roles. This is an important step forward that helps apply the principle of least privilege more effectively in large-scale Kubernetes environments.
+This week, AWS brought a wave of new updates spanning AI, databases, and pre-migration infrastructure assessment capabilities. Here are the most notable highlights that caught my attention.
 
-Key points to know:
+## Claude Opus 4.8 Now Available on AWS
 
-* A session policy is an inline IAM policy specified when creating or updating a Pod Identity association.
-* Effective permissions = intersection between the IAM role permissions and the session policy → the session policy can only narrow permissions, not expand them.
-* Helps avoid over-permissioning when reusing a single IAM role for multiple workloads with different needs.
-* Supports both same-account and cross-account (via IAM role chaining).
-* Significantly reduces the number of IAM roles that need to be managed, helping avoid hitting IAM quota limits in large clusters.
-* Easily configured through the AWS Management Console, AWS CLI, or AWS SDK when creating an association between a Kubernetes ServiceAccount and an IAM role.
+Anthropic’s most powerful model to date, **Claude Opus 4.8**, is now generally available through Amazon Bedrock and the Claude platform on AWS.
 
-This feature is especially useful when you have many applications running on the same IAM role but need different permission restrictions (for example: one pod only reads a specific S3 bucket, another pod only calls certain APIs).
+The standout feature of this version is its enhanced ability to handle long-context tasks, automated coding, and complex reasoning. For developers, Claude can now ingest an entire codebase, plan out modifications before execution, and maintain context across long sessions—rather than just processing isolated code snippets.
 
-...Image...
+When used via Amazon Bedrock, you still get all the enterprise-grade management benefits of AWS, such as Guardrails, Knowledge Bases, and integrated data privacy governance.
 
-...Link...
+---
 
-...Guide...
+## Next-Generation AWS Resilience Hub
+
+AWS has upgraded the Resilience Hub to help SREs and DevOps teams better manage system resilience at scale.
+
+What I find impressive is that this service does not just assess application readiness; it also assists in defining SLO policies, designing Disaster Recovery (DR) strategies, automatically discovering dependencies, and evaluating workloads against the AWS Well-Architected Framework using AI.
+
+If you are running multiple workloads across your organization, this will be a highly effective tool to track fault tolerance centrally.
+
+---
+
+## AWS Transform Enhances Pre-Migration Assessments
+
+Building on top of the previously introduced Continuous Modernization features, **AWS Transform** now supports pre-migration assessments before moving systems to AWS.
+
+The service can import data from RVTools, CMDBs, or other discovery tools to estimate Total Cost of Ownership (TCO), analyze application modernization potential, and evaluate cloud readiness within minutes per repository.
+
+In my opinion, this gives businesses a much clearer picture of costs and architecture complexity before kicking off a migration project.
+
+---
+
+## Aurora MySQL Taps into Kiro Powers
+
+A fascinating update this week is the integration of **Aurora MySQL with Kiro Powers**.
+
+Developers can now leverage natural language to perform various operational tasks, including:
+* Querying data.
+* Managing database schemas.
+* Scaling Aurora Serverless clusters.
+* Migrating from Amazon RDS to Aurora.
+* Setting up replication.
+
+Instead of manual operations or writing complex SQL statements, the AI generates the required API calls, SQL scripts, and configurations for developers to review before execution.
+
+---
+
+## OpenSearch Serverless for Agentic AI
+
+AWS also introduced the next generation of **OpenSearch Serverless**, specifically optimized for AI Agent applications.
+
+The service fully supports vector search, seamlessly scales from 0 to thousands of requests per second, and natively integrates with development tools like Cursor, Claude Code, Kiro, and Vercel via Agent Skills.
+
+---
+
+## Conclusion
+
+AWS's recent strategy is becoming crystal clear: embedding AI into the entire software development lifecycle—from coding and infrastructure assessment to database management, operations, and application modernization.
+
+Rather than just focusing on code generation, AWS is building a robust ecosystem where AI becomes a true "teammate" for developers at every single stage of the engineering pipeline.
+
+Original Source: https://aws.amazon.com/blogs/aws/

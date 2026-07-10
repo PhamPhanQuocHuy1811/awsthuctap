@@ -1,31 +1,43 @@
 ---
 title: "Blog 3"
-date: 2024-01-01
-weight: 1
+date: 2026-07-10
+weight: 3
 chapter: false
 pre: " <b> 3.3. </b> "
+description: "Optimizing security monitoring by integrating Amazon S3 Server Access Logs directly with CloudWatch Logs."
 ---
-{{% notice warning %}}
-⚠️ **Note:** The information below is for reference purposes only. Please **do not copy verbatim** for your report, including this warning.
-{{% /notice %}}
 
-# SESSION POLICIES IN AMAZON EKS POD IDENTITY
+# Optimizing Security Monitoring with Amazon S3 Server Access Logs and CloudWatch Logs Integration
 
-Amazon EKS Pod Identity has recently added the session policies feature, allowing you to narrow IAM permissions flexibly and precisely for each pod without needing to create many separate IAM roles. This is an important step forward that helps apply the principle of least privilege more effectively in large-scale Kubernetes environments.
+Hello team,
 
-Key points to know:
+In this post, I would like to share an architectural solution from AWS that addresses security monitoring challenges for Amazon S3 while significantly reducing operational overhead.
 
-* A session policy is an inline IAM policy specified when creating or updating a Pod Identity association.
-* Effective permissions = intersection between the IAM role permissions and the session policy → the session policy can only narrow permissions, not expand them.
-* Helps avoid over-permissioning when reusing a single IAM role for multiple workloads with different needs.
-* Supports both same-account and cross-account (via IAM role chaining).
-* Significantly reduces the number of IAM roles that need to be managed, helping avoid hitting IAM quota limits in large clusters.
-* Easily configured through the AWS Management Console, AWS CLI, or AWS SDK when creating an association between a Kubernetes ServiceAccount and an IAM role.
+Previously, to analyze S3 Server Access Logs, administrators had to set up dedicated destination buckets, build complex Data Transformation (ETL) pipelines, and maintain separate analytics infrastructure. AWS now supports delivering S3 Server Access Logs directly to Amazon CloudWatch Logs. This process automatically converts raw log data into structured JSON format, enabling instant queries and real-time alerting.
 
-This feature is especially useful when you have many applications running on the same IAM role but need different permission restrictions (for example: one pod only reads a specific S3 bucket, another pod only calls certain APIs).
+Here are the four key operational capabilities unlocked by this solution:
 
-...Image...
+* **Enable (Synchronous Collection):** Using CloudWatch Telemetry Enablement Rules, systems can automatically enable S3 log collection across an entire AWS account or Organization with minimal configuration.
+* **Query (Data Insights):** Utilize CloudWatch Logs Insights with SQL-like syntax to perform deep-dive analysis on events. Administrators can easily pinpoint unauthorized access attempts or detect anomalous data download patterns.
+* **Alert (Proactive Monitoring):** Supports creating Metric Filters to continuously monitor logs and trigger CloudWatch Alarms when there is a surge in 403, 404, or 5xx error codes, or when anonymous access exceeds safe thresholds.
+* **Rank (Scoping & Identification):** Integrates with Contributor Insights to automatically analyze and rank the top IP addresses or IAM users causing the most errors, as well as the top data consumers in real-time.
 
-...Link...
+---
 
-...Guide...
+## Evaluating S3 Access Logs vs. CloudTrail Data Events
+
+Many architectures currently rely on CloudTrail and often question the necessity of S3 Access Logs. From a security architecture perspective, these two tools complement each other perfectly:
+
+* **AWS CloudTrail Data Events:** Optimized for identity attribution (IAM Principals, Roles) and recording API operations (`GetObject`, `PutObject`) in near real-time.
+* **Amazon S3 Server Access Logs:** Provides HTTP-level metadata that CloudTrail lacks, including TLS versions, cipher suites, operational latency, and exact bytes transferred.
+
+Combining both log sources establishes a robust defense-in-depth security posture for your S3 storage layer.
+
+---
+
+## Practical Deployment
+
+To accelerate adoption, AWS provides a ready-to-use CloudFormation template. Deploying this template automatically spins up a comprehensive **Security, Compliance & Audit Dashboard** in CloudWatch. This dashboard aggregates all critical metrics, including total request volume, denied IP addresses, outbound data transfer, and bulk object deletion activities.
+
+Original Source Link for further reference:
+https://aws.amazon.com/blogs/security/why-and-how-to-migrate-to-a-transit-gateway-attached-aws-network-firewall/

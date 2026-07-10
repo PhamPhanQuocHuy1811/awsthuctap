@@ -1,22 +1,18 @@
 ---
 title: "Blogs Posted"
-date: 2024-01-01
+date: 2026-07-10
 weight: 3
 chapter: false
 pre: " <b> 3. </b> "
 ---
 
-{{% notice warning %}}
-⚠️ **Note:** The information below is for reference purposes only. Please **do not copy verbatim** for your own report, including this warning.
-{{% /notice %}}
+This section provides a detailed list and overview of the technical blog posts I researched and published throughout my internship:
 
-This section will list and introduce the blogs you have posted to [AWS Study Group](https://www.facebook.com/groups/awsstudygroupfcj). For example:
+###  [Blog 1 - Multi-Region Replication for Amazon Cognito](3.1-blog1/)
+This post explores Amazon Cognito's Multi-Region Replication feature, which automatically synchronizes user profiles, credentials, and User Pool configurations across regions. This solution optimizes Disaster Recovery (DR) capabilities, ensures High Availability (HA), and delivers a seamless authentication experience for end users.
 
-###  [Blog 1 - SESSION POLICIES IN AMAZON EKS POD IDENTITY](3.1-Blog1/)
-This blog introduces the newly added session policies feature in Amazon EKS Pod Identity, which allows you to narrow IAM permissions flexibly and precisely for each pod without needing to create multiple separate IAM roles. This is an important step forward that helps apply the principle of least privilege more effectively in large-scale Kubernetes environments.
+###  [Blog 2 - AWS Weekly Highlights: Claude Opus 4.8 and Key Updates](3.2-blog2/)
+A weekly summary of outstanding technology updates from AWS, including the integration of Anthropic's powerful Claude Opus 4.8 model on Amazon Bedrock, the next-generation AWS Resilience Hub, pre-migration assessment enhancements in AWS Transform, and natural language database operations with Aurora MySQL powered by Kiro.
 
-###  [Blog 2 - ...](3.2-Blog2/)
-This blog introduces the newly added session policies feature in Amazon EKS Pod Identity, which allows you to narrow IAM permissions flexibly and precisely for each pod without needing to create multiple separate IAM roles. This is an important step forward that helps apply the principle of least privilege more effectively in large-scale Kubernetes environments.
-
-###  [Blog 3 - ...](3.3-Blog3/)
-This blog introduces the newly added session policies feature in Amazon EKS Pod Identity, which allows you to narrow IAM permissions flexibly and precisely for each pod without needing to create multiple separate IAM roles. This is an important step forward that helps apply the principle of least privilege more effectively in large-scale Kubernetes environments.
+###  [Blog 3 - Integrating Amazon S3 Server Access Logs with CloudWatch Logs](3.3-blog3/)
+This post shares an architectural approach to delivering S3 Access Logs directly to CloudWatch Logs in a structured JSON format. This integration enables administrators to instantly query access logs, set up proactive security alerts, and quickly isolate anomalous IP addresses to reinforce the system's security posture.
