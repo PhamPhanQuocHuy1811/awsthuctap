@@ -6,7 +6,7 @@ chapter: false
 pre: " <b> 1.2. </b> "
 ---
 
-# WORKLOG - TUẦN 2
+
 
 ### Mục tiêu tuần
 

@@ -6,7 +6,7 @@ chapter: false
 pre: " <b> 1.7. </b> "
 ---
 
-# WEEK 7 WORKLOG
+
 
 ### Weekly Objectives
 
