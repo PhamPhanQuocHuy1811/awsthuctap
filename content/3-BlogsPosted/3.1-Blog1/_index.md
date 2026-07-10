@@ -1,6 +1,6 @@
 ---
-title: "Blog 1"
-date: 2024-01-01
+title: "Bài đăng blog 1"
+date: 2026-07-10
 weight: 1
 chapter: false
 pre: " <b> 3.1. </b> "
