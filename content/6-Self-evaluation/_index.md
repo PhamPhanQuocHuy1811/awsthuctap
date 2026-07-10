@@ -1,39 +1,35 @@
 ---
-title: "Self-Assessment"
+title: "Self-Evaluation"
 date: 2024-01-01
 weight: 6
 chapter: false
 pre: " <b> 6. </b> "
 ---
 
-{{% notice warning %}}
-⚠️ **Note:** The information below is for reference purposes only. Please **do not copy it verbatim** into your report, including this warning.
-{{% /notice %}}
+During my internship at **Amazon Web Services Vietnam Company Limited** from **April 15, 2026** to **July 15, 2026**, I had the opportunity to learn, practice, and apply the knowledge acquired from my university into a real-world working environment. I participated in **developing and testing the DaiMarket project**, through which I enhanced my skills in programming, analysis, report writing, adaptability, and problem-solving.
 
-During my internship at **[Company/Organization Name]** from **[start date]** to **[end date]**, I had the opportunity to learn, practice, and apply the knowledge acquired in school to a real-world working environment.  
-I participated in **[briefly describe the main project or task]**, through which I improved my skills in **[list skills: programming, analysis, reporting, communication, etc.]**.  
+Regarding professional ethics, I always strived to complete my assignments effectively, strictly complied with workplace regulations, and actively collaborated with colleagues to improve overall work performance.
 
-In terms of work ethic, I always strived to complete tasks well, complied with workplace regulations, and actively engaged with colleagues to improve work efficiency.
+To objectively reflect on my internship duration, I would like to evaluate myself based on the following criteria:
 
-To objectively reflect on my internship period, I would like to evaluate myself based on the following criteria:
+| NO. | Criteria | Description | Good | Fair | Average |
+| :--- | :--- | :--- | :---: | :---: | :---: |
+| 1 | **Professional knowledge and skills** | In-depth understanding of the field, practical application of knowledge, proficiency in using tools, and quality of work. | ☐ | ✅ | ☐ |
+| 2 | **Learning ability** | Capability to absorb new knowledge and learn quickly. | ☐ | ✅ | ☐ |
+| 3 | **Proactivity** | Taking initiative and actively seeking out tasks without waiting for instructions. | ✅ | ☐ | ☐ |
+| 4 | **Sense of responsibility** | Completing assignments on time with guaranteed quality. | ✅ | ☐ | ☐ |
+| 5 | **Discipline** | Complying with schedules, rules, and workflows. | ✅ | ☐ | ☐ |
+| 6 | **Progressive mindset** | Willingness to receive feedback and continuously improve oneself. | ✅ | ☐ | ☐ |
+| 7 | **Communication** | Presenting ideas and reporting work progress clearly. | ☐ | ✅ | ☐ |
+| 8 | **Teamwork** | Working effectively with colleagues and actively participating in team activities. | ☐ | ✅ | ☐ |
+| 9 | **Professional behavior** | Respecting colleagues, partners, and the working environment. | ✅ | ☐ | ☐ |
+| 10 | **Problem-solving skills** | Identifying problems, proposing solutions, and demonstrating creativity. | ☐ | ✅ | ☐ |
+| 11 | **Contribution to the project/team** | Work efficiency, creative ideas, and recognition from teammates. | ✅ | ☐ | ☐ |
+| 12 | **Overall** | General evaluation of the entire internship process. | ✅ | ☐ | ☐ |
 
-| No. | Criteria                            | Description                                                                                      | Good | Fair | Average |
-| --- | ----------------------------------- | ------------------------------------------------------------------------------------------------ | ---- | ---- | ------- |
-| 1   | **Professional knowledge & skills** | Understanding of the field, applying knowledge in practice, proficiency with tools, work quality | ✅    | ☐    | ☐       |
-| 2   | **Ability to learn**                | Ability to absorb new knowledge and learn quickly                                                | ☐    | ✅    | ☐       |
-| 3   | **Proactiveness**                   | Taking initiative, seeking out tasks without waiting for instructions                            | ✅    | ☐    | ☐       |
-| 4   | **Sense of responsibility**         | Completing tasks on time and ensuring quality                                                    | ✅    | ☐    | ☐       |
-| 5   | **Discipline**                      | Adhering to schedules, rules, and work processes                                                 | ☐    | ☐    | ✅       |
-| 6   | **Progressive mindset**             | Willingness to receive feedback and improve oneself                                              | ☐    | ✅    | ☐       |
-| 7   | **Communication**                   | Presenting ideas and reporting work clearly                                                      | ☐    | ✅    | ☐       |
-| 8   | **Teamwork**                        | Working effectively with colleagues and participating in teams                                   | ✅    | ☐    | ☐       |
-| 9   | **Professional conduct**            | Respecting colleagues, partners, and the work environment                                        | ✅    | ☐    | ☐       |
-| 10  | **Problem-solving skills**          | Identifying problems, proposing solutions, and showing creativity                                | ☐    | ✅    | ☐       |
-| 11  | **Contribution to project/team**    | Work effectiveness, innovative ideas, recognition from the team                                  | ✅    | ☐    | ☐       |
-| 12  | **Overall**                         | General evaluation of the entire internship period                                               | ✅    | ☐    | ☐       |
+### Areas for Improvement
 
-### Needs Improvement
-
-* Strengthen discipline and strictly comply with the rules and regulations of the company or any organization  
-* Improve problem-solving thinking  
-* Enhance communication skills in both daily interactions and professional contexts, including handling situations effectively
+* Continue to consolidate professional knowledge and technical skills, especially the ability to apply learned concepts and tools into practice.
+* Develop a more systematic learning method to absorb new technologies more efficiently and proactively document key lessons learned after every assignment.
+* Improve communication and teamwork capabilities by explaining technical issues more clearly, actively sharing progress, and providing constructive responses to feedback from team members.
+* Enhance problem-solving skills by analyzing root causes, comparing multiple alternatives, and validating results thoroughly before selecting a final solution.
