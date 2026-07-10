@@ -10,6 +10,7 @@ pre: " <b> 1.1. </b> "
 {{% /notice %}}
 
 
+
 ### Mục tiêu tuần 1:
 
 * Kết nối, làm quen với các thành viên trong First Cloud AI Journey.
