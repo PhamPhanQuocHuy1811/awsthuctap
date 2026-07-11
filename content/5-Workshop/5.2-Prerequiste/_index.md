@@ -1,242 +1,70 @@
 ---
-title : "Prerequiste"
-date : 2024-01-01 
-weight : 2 
-chapter : false
-pre : " <b> 5.2. </b> "
+title: "Prerequisite"
+date: 2024-01-01
+weight: 2
+chapter: false
+pre: " <b> 5.2. </b> "
 ---
 
-#### IAM permissions
-Add the following IAM permission policy to your user account to deploy and cleanup this workshop.
+#### Required accounts and tools
+
+- AWS account in the **us-east-1** region.
+- GitHub repository containing frontend and backend source code.
+- Vercel account connected to GitHub for frontend deployment.
+- SSH key pair for EC2 access, or another approved EC2 access method.
+- Node.js 22 on the backend server, npm, PM2, Git, PostgreSQL client, and AWS CLI v2.
+- A PostgreSQL database on Amazon RDS and a private S3 bucket/prefix for product assets.
+- SePay API key and bank transfer configuration for payment webhook testing.
+
+#### Environment variables
+
+{{% notice note %}}
+A friendly Reminder: Do not commit dotenv file to Git or paste them into a AI conversation. Database passwords, JWT secrets, SePay API keys, and bank account numbers below are masked/censored on purpose.
+{{% /notice %}}
+
+```text
+PORT=5000
+NODE_ENV=production
+DATABASE_URL=postgresql://postgres:<PASSWORD>@<RDS-ENDPOINT>:5432/marketplace
+JWT_SECRET=<must be long and secure>
+CORS_ORIGIN=<example: https://daiai-aws.vercel.app>
+SEED_MOCK_DATA=false
+AWS_REGION=us-east-1
+S3_BUCKET_NAME=<bucket-name>
+S3_PRODUCT_PREFIX=products
+SEPAY_API_KEY=<Where to get: SePay Dashboard -> Settings -> API Key>
+BANK_BIN=<bank-bin>
+BANK_NAME=MB Bank
+BANK_ACCOUNT_NO=<masked>
+BANK_ACCOUNT_NAME=<masked>
 ```
+
+#### IAM permission model
+
+The EC2 instance uses an **IAM Role** instead of static AWS access keys. This avoids storing long-term AWS credentials on the server. The role is limited to the `products/` prefix of the selected S3 bucket.
+![iam role gắn vào s3](../../images/5-Workshop/5.2-prerequisite/IAMrole_marketplace-ec2-s3-role.png)
+```json
 {
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Sid": "VisualEditor0",
-            "Effect": "Allow",
-            "Action": [
-                "cloudformation:*",
-                "cloudwatch:*",
-                "ec2:AcceptTransitGatewayPeeringAttachment",
-                "ec2:AcceptTransitGatewayVpcAttachment",
-                "ec2:AllocateAddress",
-                "ec2:AssociateAddress",
-                "ec2:AssociateIamInstanceProfile",
-                "ec2:AssociateRouteTable",
-                "ec2:AssociateSubnetCidrBlock",
-                "ec2:AssociateTransitGatewayRouteTable",
-                "ec2:AssociateVpcCidrBlock",
-                "ec2:AttachInternetGateway",
-                "ec2:AttachNetworkInterface",
-                "ec2:AttachVolume",
-                "ec2:AttachVpnGateway",
-                "ec2:AuthorizeSecurityGroupEgress",
-                "ec2:AuthorizeSecurityGroupIngress",
-                "ec2:CreateClientVpnEndpoint",
-                "ec2:CreateClientVpnRoute",
-                "ec2:CreateCustomerGateway",
-                "ec2:CreateDhcpOptions",
-                "ec2:CreateFlowLogs",
-                "ec2:CreateInternetGateway",
-                "ec2:CreateLaunchTemplate",
-                "ec2:CreateNetworkAcl",
-                "ec2:CreateNetworkInterface",
-                "ec2:CreateNetworkInterfacePermission",
-                "ec2:CreateRoute",
-                "ec2:CreateRouteTable",
-                "ec2:CreateSecurityGroup",
-                "ec2:CreateSubnet",
-                "ec2:CreateSubnetCidrReservation",
-                "ec2:CreateTags",
-                "ec2:CreateTransitGateway",
-                "ec2:CreateTransitGatewayPeeringAttachment",
-                "ec2:CreateTransitGatewayPrefixListReference",
-                "ec2:CreateTransitGatewayRoute",
-                "ec2:CreateTransitGatewayRouteTable",
-                "ec2:CreateTransitGatewayVpcAttachment",
-                "ec2:CreateVpc",
-                "ec2:CreateVpcEndpoint",
-                "ec2:CreateVpcEndpointConnectionNotification",
-                "ec2:CreateVpcEndpointServiceConfiguration",
-                "ec2:CreateVpnConnection",
-                "ec2:CreateVpnConnectionRoute",
-                "ec2:CreateVpnGateway",
-                "ec2:DeleteCustomerGateway",
-                "ec2:DeleteFlowLogs",
-                "ec2:DeleteInternetGateway",
-                "ec2:DeleteNetworkInterface",
-                "ec2:DeleteNetworkInterfacePermission",
-                "ec2:DeleteRoute",
-                "ec2:DeleteRouteTable",
-                "ec2:DeleteSecurityGroup",
-                "ec2:DeleteSubnet",
-                "ec2:DeleteSubnetCidrReservation",
-                "ec2:DeleteTags",
-                "ec2:DeleteTransitGateway",
-                "ec2:DeleteTransitGatewayPeeringAttachment",
-                "ec2:DeleteTransitGatewayPrefixListReference",
-                "ec2:DeleteTransitGatewayRoute",
-                "ec2:DeleteTransitGatewayRouteTable",
-                "ec2:DeleteTransitGatewayVpcAttachment",
-                "ec2:DeleteVpc",
-                "ec2:DeleteVpcEndpoints",
-                "ec2:DeleteVpcEndpointServiceConfigurations",
-                "ec2:DeleteVpnConnection",
-                "ec2:DeleteVpnConnectionRoute",
-                "ec2:Describe*",
-                "ec2:DetachInternetGateway",
-                "ec2:DisassociateAddress",
-                "ec2:DisassociateRouteTable",
-                "ec2:GetLaunchTemplateData",
-                "ec2:GetTransitGatewayAttachmentPropagations",
-                "ec2:ModifyInstanceAttribute",
-                "ec2:ModifySecurityGroupRules",
-                "ec2:ModifyTransitGatewayVpcAttachment",
-                "ec2:ModifyVpcAttribute",
-                "ec2:ModifyVpcEndpoint",
-                "ec2:ReleaseAddress",
-                "ec2:ReplaceRoute",
-                "ec2:RevokeSecurityGroupEgress",
-                "ec2:RevokeSecurityGroupIngress",
-                "ec2:RunInstances",
-                "ec2:StartInstances",
-                "ec2:StopInstances",
-                "ec2:UpdateSecurityGroupRuleDescriptionsEgress",
-                "ec2:UpdateSecurityGroupRuleDescriptionsIngress",
-                "iam:AddRoleToInstanceProfile",
-                "iam:AttachRolePolicy",
-                "iam:CreateInstanceProfile",
-                "iam:CreatePolicy",
-                "iam:CreateRole",
-                "iam:DeleteInstanceProfile",
-                "iam:DeletePolicy",
-                "iam:DeleteRole",
-                "iam:DeleteRolePolicy",
-                "iam:DetachRolePolicy",
-                "iam:GetInstanceProfile",
-                "iam:GetPolicy",
-                "iam:GetRole",
-                "iam:GetRolePolicy",
-                "iam:ListPolicyVersions",
-                "iam:ListRoles",
-                "iam:PassRole",
-                "iam:PutRolePolicy",
-                "iam:RemoveRoleFromInstanceProfile",
-                "lambda:CreateFunction",
-                "lambda:DeleteFunction",
-                "lambda:DeleteLayerVersion",
-                "lambda:GetFunction",
-                "lambda:GetLayerVersion",
-                "lambda:InvokeFunction",
-                "lambda:PublishLayerVersion",
-                "logs:CreateLogGroup",
-                "logs:DeleteLogGroup",
-                "logs:DescribeLogGroups",
-                "logs:PutRetentionPolicy",
-                "route53:ChangeTagsForResource",
-                "route53:CreateHealthCheck",
-                "route53:CreateHostedZone",
-                "route53:CreateTrafficPolicy",
-                "route53:DeleteHostedZone",
-                "route53:DisassociateVPCFromHostedZone",
-                "route53:GetHostedZone",
-                "route53:ListHostedZones",
-                "route53domains:ListDomains",
-                "route53domains:ListOperations",
-                "route53domains:ListTagsForDomain",
-                "route53resolver:AssociateResolverEndpointIpAddress",
-                "route53resolver:AssociateResolverRule",
-                "route53resolver:CreateResolverEndpoint",
-                "route53resolver:CreateResolverRule",
-                "route53resolver:DeleteResolverEndpoint",
-                "route53resolver:DeleteResolverRule",
-                "route53resolver:DisassociateResolverEndpointIpAddress",
-                "route53resolver:DisassociateResolverRule",
-                "route53resolver:GetResolverEndpoint",
-                "route53resolver:GetResolverRule",
-                "route53resolver:ListResolverEndpointIpAddresses",
-                "route53resolver:ListResolverEndpoints",
-                "route53resolver:ListResolverRuleAssociations",
-                "route53resolver:ListResolverRules",
-                "route53resolver:ListTagsForResource",
-                "route53resolver:UpdateResolverEndpoint",
-                "route53resolver:UpdateResolverRule",
-                "s3:AbortMultipartUpload",
-                "s3:CreateBucket",
-                "s3:DeleteBucket",
-                "s3:DeleteObject",
-                "s3:GetAccountPublicAccessBlock",
-                "s3:GetBucketAcl",
-                "s3:GetBucketOwnershipControls",
-                "s3:GetBucketPolicy",
-                "s3:GetBucketPolicyStatus",
-                "s3:GetBucketPublicAccessBlock",
-                "s3:GetObject",
-                "s3:GetObjectVersion",
-                "s3:GetBucketVersioning",
-                "s3:ListAccessPoints",
-                "s3:ListAccessPointsForObjectLambda",
-                "s3:ListAllMyBuckets",
-                "s3:ListBucket",
-                "s3:ListBucketMultipartUploads",
-                "s3:ListBucketVersions",
-                "s3:ListJobs",
-                "s3:ListMultipartUploadParts",
-                "s3:ListMultiRegionAccessPoints",
-                "s3:ListStorageLensConfigurations",
-                "s3:PutAccountPublicAccessBlock",
-                "s3:PutBucketAcl",
-                "s3:PutBucketPolicy",
-                "s3:PutBucketPublicAccessBlock",
-                "s3:PutObject",
-                "secretsmanager:CreateSecret",
-                "secretsmanager:DeleteSecret",
-                "secretsmanager:DescribeSecret",
-                "secretsmanager:GetSecretValue",
-                "secretsmanager:ListSecrets",
-                "secretsmanager:ListSecretVersionIds",
-                "secretsmanager:PutResourcePolicy",
-                "secretsmanager:TagResource",
-                "secretsmanager:UpdateSecret",
-                "sns:ListTopics",
-                "ssm:DescribeInstanceProperties",
-                "ssm:DescribeSessions",
-                "ssm:GetConnectionStatus",
-                "ssm:GetParameters",
-                "ssm:ListAssociations",
-                "ssm:ResumeSession",
-                "ssm:StartSession",
-                "ssm:TerminateSession"
-            ],
-            "Resource": "*"
-        }
-    ]
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "ListBucketProductPrefix",
+      "Effect": "Allow",
+      "Action": ["s3:ListBucket"],
+      "Resource": "arn:aws:s3:::marketplace-frontend-thao",
+      "Condition": { "StringLike": { "s3:prefix": ["products/*"] } }
+    },
+    {
+      "Sid": "ManageProductObjects",
+      "Effect": "Allow",
+      "Action": ["s3:GetObject", "s3:PutObject", "s3:DeleteObject"],
+      "Resource": "arn:aws:s3:::marketplace-frontend-thao/products/*"
+    }
+  ]
 }
-
 ```
 
-#### Provision resources using CloudFormation
-
-In this lab, we will use **N.Virginia region (us-east-1)**.
-
-To prepare the workshop environment, deploy this **CloudFormation Template** (click link): [PrivateLinkWorkshop ](https://us-east-1.console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/quickcreate?templateURL=https://s3.us-east-1.amazonaws.com/reinvent-endpoints-builders-session/Nested.yaml&stackName=PLCloudSetup). Accept all of the defaults when deploying the template. 
-
-![create stack](/images/5-Workshop/5.2-Prerequisite/create-stack1.png)
-
-+ Tick 2 acknowledgement boxes
-+ Choose **Create stack**
-
-![create stack](/images/5-Workshop/5.2-Prerequisite/create-stack2.png)
-
-The **ClouddFormation** deployment requires about 15 minutes to complete.
-
-![complete](/images/5-Workshop/5.2-Prerequisite/complete.png)
-
-+ **2 VPCs** have been created
-
-![vpcs](/images/5-Workshop/5.2-Prerequisite/vpcs.png)
-
-+ **3 EC2s** have been created
-
-![EC2](/images/5-Workshop/5.2-Prerequisite/ec2.png)
+* S3 also needs to have Block All Public Access enabled if it's not already.
+![s3 block all public access](../../images/5-Workshop/5.2-prerequisite/block-all-public-access-for-s3.png)
+<!-- INSERT FIGURE 5.2: Screenshot of EC2 instance Security tab showing IAM Role = marketplace-ec2-s3-role. -->
+<!-- INSERT FIGURE 5.3: Screenshot of S3 bucket with Block all public access enabled. -->

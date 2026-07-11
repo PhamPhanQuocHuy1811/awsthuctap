@@ -1,57 +1,36 @@
 ---
-title : "Prepare the environment"
-date : 2024-01-01
-weight : 1
-chapter : false
-pre : " <b> 5.4.1 </b> "
+title: "Deploy frontend to Vercel"
+date: 2024-01-01
+weight: 1
+chapter: false
+pre: " <b> 5.4.1 </b> "
 ---
 
-To prepare for this part of the workshop you will need to:
-+ Deploying a CloudFormation stack 
-+ Modifying a VPC route table. 
+#### Vercel settings
 
-These components work together to simulate on-premises DNS forwarding and name resolution.
+| Setting | Value |
+| --- | --- |
+| Framework preset | Vite |
+| Root directory | `frontend` |
+| Install command | `npm install` |
+| Build command | `npm run build` |
+| Output directory | `dist` |
+| Production domain | `https://daiai-aws.vercel.app` |
 
-#### Deploy the CloudFormation stack
+![alt text](<../../../images/5-Workshop/5.4-frontend-deploy-and-s3-storage/5.4.1-deploy-frontend-vercel/Create vercel.png>)
 
-The CloudFormation template will create additional services to support an on-premises simulation:
-+ One Route 53 Private Hosted Zone that hosts Alias records for the PrivateLink S3 endpoint
-+ One Route 53 Inbound Resolver endpoint that enables "VPC Cloud" to resolve inbound DNS resolution requests to the Private Hosted Zone
-+ One Route 53 Outbound Resolver endpoint that enables "VPC On-prem" to forward DNS requests for S3 to "VPC Cloud"
+#### SPA routing fix
 
-![route 53 diagram](/images/5-Workshop/5.4-S3-onprem/route53.png)
+Direct navigation to routes such as `/login` or `/products` can fail unless Vercel rewrites SPA routes to `index.html`. This was fixed during deployment with the following `vercel.json` rewrites:
 
-1. Click the following link to open the [AWS CloudFormation console](https://us-east-1.console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/quickcreate?templateURL=https://s3.amazonaws.com/reinvent-endpoints-builders-session/R53CF.yaml&stackName=PLOnpremSetup). The required template will be pre-loaded into the menu. Accept all default and click Create stack.
+```json
+{
+  "rewrites": [
+    { "source": "/api/:path*", "destination": "http://<EC2-PUBLIC-IP>:5000/api/:path*" },
+    { "source": "/webhook/:path*", "destination": "http://<EC2-PUBLIC-IP>:5000/webhook/:path*" },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}
+```
 
-![Create stack](/images/5-Workshop/5.4-S3-onprem/create-stack.png)
-
-![Button](/images/5-Workshop/5.4-S3-onprem/create-stack-button.png)
-
-It may take a few minutes for stack deployment to complete. You can continue with the next step without waiting for the deployemnt to finish.
-
-#### Update on-premise private route table
-
-This workshop uses a strongSwan VPN running on an EC2 instance to simulate connectivty between an on-premises datacenter and the AWS cloud. Most of the required components are provisioned before your start. To finalize the VPN configuration, you will modify the "VPC On-prem" routing table to direct traffic destined for the cloud to the strongSwan VPN instance.
-
-1. Open the Amazon EC2 console 
-
-2. Select the instance named infra-vpngw-test. From the Details tab, copy the Instance ID and paste this into your text editor
-
-![ec2 id](/images/5-Workshop/5.4-S3-onprem/ec2-onprem-id.png)
-
-3. Navigate to the VPC menu by using the Search box at the top of the browser window.
-
-4. Click on Route Tables, select the RT Private On-prem route table, select the Routes tab, and click Edit Routes.
-
-![rt](/images/5-Workshop/5.4-S3-onprem/rt.png)
-
-5. Click Add route.
-+ Destination: your Cloud VPC cidr range
-+ Target: ID of your infra-vpngw-test instance (you saved in your editor at step 1)
-
-![add route](/images/5-Workshop/5.4-S3-onprem/add-route.png)
-
-6. Click Save changes
-
-
-
+<!-- INSERT FIGURE 5.7: Screenshot of the Vercel project settings/deployment and a browser test of direct /login route access. -->

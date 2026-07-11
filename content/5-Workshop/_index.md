@@ -5,27 +5,29 @@ weight: 5
 chapter: false
 pre: " <b> 5. </b> "
 ---
-{{% notice warning %}}
-⚠️ **Note:** The information below is for reference purposes only. Please **do not copy verbatim** for your report, including this warning.
-{{% /notice %}}
 
-# Secure Hybrid Access to S3 using VPC Endpoints
+# Cloud-based Digital Product Marketplace with 3D Preview — DaiMarket
 
 #### Overview
 
-**AWS PrivateLink** provides private connectivity to AWS services from VPCs and your on-premises networks, without exposing your traffic to the Public Internet.
+This Workshop section documents the practical deployment and validation of **DaiMarket**, a cloud-based marketplace for digital products. The project sells PDF/Word documents and 3D model files, supports browser-based 3D preview, integrates SePay payment confirmation, and stores product assets on Amazon S3.
 
-In this lab, you will learn how to create, configure, and test VPC endpoints that enable your workloads to reach AWS services without traversing the Public Internet.
+The workshop focuses on deploying the application stack to a cost-aware cloud environment. The final working architecture uses **Vercel** for frontend hosting, **Amazon EC2** for the Node.js/Express backend, **Amazon RDS PostgreSQL** for relational data, **Amazon S3** for product file storage, and **IAM Role** permissions for secure S3 access from EC2.
 
-You will create two types of endpoints to access Amazon S3: a Gateway VPC endpoint, and an Interface VPC endpoint. These two types of VPC endpoints offer different benefits depending on if you are accessing Amazon S3 from the cloud or your on-premises location
-+ **Gateway** - Create a gateway endpoint to send traffic to Amazon S3 or DynamoDB using private IP addresses.You route traffic from your VPC to the gateway endpoint using route tables.
-+ **Interface** - Create an interface endpoint to send traffic to endpoint services that use a Network Load Balancer to distribute traffic. Traffic destined for the endpoint service is resolved using DNS.
+- **Frontend:** React + Vite hosted on Vercel. CloudFront remains an alternative target, but account verification prevented using it during the demo period.
+- **Backend:** Node.js + Express + Prisma 7 running on an EC2 instance through PM2.
+- **Database:** Amazon RDS PostgreSQL for users, roles, products, categories, orders, payment methods, and library ownership.
+- **Object storage:** Amazon S3 bucket `marketplace-frontend-thao`, using the `products/` prefix for private product assets.
+- **Security:** IAM Role `marketplace-ec2-s3-role` attached to EC2, with least-privilege access to the S3 `products/` prefix.
+- **Payment:** SePay webhook endpoint for real-time transfer notification and order status updates.
+
+<!-- INSERT FIGURE 5.0: Updated AWS architecture diagram showing Vercel or CloudFront, EC2 Backend, RDS PostgreSQL, S3 Product Assets, IAM Role, and SePay webhook. -->
 
 #### Content
 
-1. [Workshop overview](5.1-Workshop-overview)
-2. [Prerequiste](5.2-Prerequiste/)
-3. [Access S3 from VPC](5.3-S3-vpc/)
-4. [Access S3 from On-premises](5.4-S3-onprem/)
-5. [VPC Endpoint Policies (Bonus)](5.5-Policy/)
-6. [Clean up](5.6-Cleanup/)
+1. [Workshop overview](5.1-Workshop-overview/)
+2. [Prerequisite](5.2-prerequisite/)
+3. [Backend deployment with EC2 and RDS](5.3-backend-deploy-ec2-and-rds/)
+4. [Frontend deployment and S3 product storage](5.4-frontend-deploy-and-s3-storage/)
+5. [Payment, admin validation, and system testing](5.5-payment-admin-system-testing/)
+6. [Cleanup, cost control, and next steps](5.6-cleanup-cost-next-steps/)

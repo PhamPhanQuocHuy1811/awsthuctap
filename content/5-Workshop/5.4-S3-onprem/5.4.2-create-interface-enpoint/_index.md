@@ -1,43 +1,36 @@
 ---
-title : "Create an S3 Interface endpoint"
-date : 2024-01-01
-weight : 2
-chapter : false
-pre : " <b> 5.4.2 </b> "
+title: "API rewrite and webhook forwarding"
+date: 2024-01-01
+weight: 2
+chapter: false
+pre: " <b> 5.4.2 </b> "
 ---
 
-In this section you will create and test an S3 interface endpoint using the simulated on-premises environment deployed as part of this workshop.
+#### API routing
 
-1. Return to the Amazon VPC menu. In the navigation pane, choose Endpoints, then click Create Endpoint.
+The frontend must call the API with relative paths such as `/api/products` and `/api/auth/login`. If the production bundle still calls `localhost:3000` or `localhost:5000`, the browser resolves those to the visitor's own machine, causing a **Network Error**. The production bundle was fixed to use relative `/api/...` paths only.
 
-2. In Create endpoint console:
-+ Name the interface endpoint
-+ In Service category, choose **aws services** 
+#### SePay webhook forwarding
 
-![name](/images/5-Workshop/5.4-S3-onprem/s3-interface-endpoint1.png)
+The old ngrok link was replaced with the deployed HTTPS domain. Vercel forwards webhook requests to the EC2 backend.
 
-3.  In the Search box, type S3 and press Enter. Select the endpoint named com.amazonaws.us-east-1.s3. Ensure that the Type column indicates Interface.
+```text
+SePay webhook URL will look like this if the setup was correct:
+https://daiai-aws.vercel.app/webhook/sepay
 
-![service](/images/5-Workshop/5.4-S3-onprem/s3-interface-endpoint2.png)
+Backend route:
+POST /webhook/sepay
+Authorization: Apikey <SEPAY_API_KEY>
+```
 
-4. For VPC, select VPC Cloud from the drop-down.
-{{% notice warning %}}
-Make sure to choose "VPC Cloud" and not "VPC On-prem"
-{{% /notice %}}
-+ Expand **Additional settings** and ensure that Enable DNS name is *not* selected (we will use this in the next part of the workshop)
+#### Verification
 
-![vpc](/images/5-Workshop/5.4-S3-onprem/s3-interface-endpoint3.png)
-
-5. Select 2 subnets in the following AZs: us-east-1a and us-east-1b
-
-![subnets](/images/5-Workshop/5.4-S3-onprem/s3-interface-endpoint4.png)
-
-6. For Security group, choose SGforS3Endpoint:
-
-![sg](/images/5-Workshop/5.4-S3-onprem/s3-interface-endpoint5.png)
-
-7. Keep the default policy - full access and click Create endpoint
-
-![success](/images/5-Workshop/5.4-S3-onprem/s3-interface-endpoint-success.png)
-
-Congratulation on successfully creating S3 interface endpoint. In the next step, we will test the interface endpoint.
+For ease of testing, the following command can be used to test products status if the backend has been successfully set up in EC2.
+```bash
+curl https://daiai-aws.vercel.app/api/products
+curl http://localhost:5000/api/products
+# Browser checks:
+# - Register/Login
+# - Product listing
+# - Admin routes include the Authorization header
+```

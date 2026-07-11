@@ -1,82 +1,72 @@
 ---
-title : "Kiểm tra Gateway Endpoint"
-date : 2024-01-01 
-weight : 2
-chapter : false
-pre : " <b> 5.3.2 </b> "
+title: "Cấu hình RDS PostgreSQL và Prisma"
+date: 2024-01-01
+weight: 2
+chapter: false
+pre: " <b> 5.3.2 </b> "
 ---
 
-#### Tạo S3 bucket
+#### Cấu hình RDS
 
-1. Đi đến S3 management console
-2. Trong Bucket console, chọn **Create bucket**
+- Engine: **PostgreSQL**.
+- Deployment: **Single-AZ** DB instance để tối ưu chi phí.
+- Instance class: **db.t4g.micro** cho môi trường demo.
+- Storage: gp3, 20 GiB, tắt autoscaling nếu chưa cần.
+- Public access: **No**. RDS chỉ cho EC2 Security Group truy cập.
+- Database name: `marketplace`.
+- Encryption: default AWS/RDS key.
 
-![Create bucket](/images/5-Workshop/5.3-S3-vpc/create-bucket.png)
+#### Deploy Prisma
 
-3. Trong Create bucket console
-+ Đặt tên bucket: chọn 1 tên mà không bị trùng trong phạm vi toàn cầu (gợi ý: lab\<số-lab\>\<tên-bạn\>)
+Vì project dùng **Prisma 7**, runtime cần đọc `DATABASE_URL` thông qua adapter config, còn migration dùng Prisma CLI script. Backend đã được chỉnh để load dotenv và dùng `PrismaPg` với SSL setting phù hợp RDS.
 
-![Bucket name](/images/5-Workshop/5.3-S3-vpc/bucket-name.png)
+```bash
+cd ~/daiai-aws-MarketplaceV1/backend
+npm run generate
+node -r dotenv/config ./node_modules/prisma/build/index.js migrate deploy
+node prisma/seed-required.js
+```
 
+#### Seed data
 
-+ Giữ nguyên giá trị của các fields khác (default)
-+ Kéo chuột xuống và chọn **Create bucket**
+- Role: `admin`, `buyer`, `seller`.
+- Payment method: MoMo, ZaloPay, MB Bank, VNPay.
+- Category có group `DOCUMENT` và `MODEL_3D`.
+- Seed production chỉ dùng **upsert**, không xóa Product, User, Order hoặc OrderItem.
 
-![Create](/images/5-Workshop/5.3-S3-vpc/create-button.png)    
+#### Kiểm tra
 
-+ Tạo thành công S3 bucket
+```bash
+psql -h <RDS-ENDPOINT> -U postgres -d marketplace -p 5432 -c 'SELECT * FROM "Role";'
+psql -h <RDS-ENDPOINT> -U postgres -d marketplace -p 5432 -c 'SELECT id, name, "group" FROM "Category" ORDER BY "group", name;'
+```
 
-![Success](/images/5-Workshop/5.3-S3-vpc/bucket-success.png)
-
-#### Kết nối với EC2 bằng session manager
-
-+ Trong workshop này, bạn sẽ dùng AWS Session Manager để kết nối đến các EC2 instances. Session Manager là 1 tính năng trong dịch vụ Systems Manager được quản lý hoàn toàn bởi AWS. System manager cho phép bạn quản lý Amazon EC2 instances và các máy ảo on-premises (VMs)thông qua 1 browser-based shell. Session Manager cung cấp khả năng quản lý phiên bản an toàn và có thể kiểm tra mà không cần mở cổng vào, duy trì máy chủ bastion host hoặc quản lý khóa SSH.
-
-+ First Cloud AI Journey [Lab](https://000058.awsstudygroup.com/1-introduce/) để hiểu sâu hơn về Session manager.
-
-1. Trong AWS Management Console, gõ Systems Manager trong ô tìm kiếm và nhấn Enter:
-
-![system manager](/images/5-Workshop/5.3-S3-vpc/sm.png)
-
-2. Từ **Systems Manager** menu, tìm **Node Management** ở thanh bên trái và chọn **Session Manager**:
-
-![system manager](/images/5-Workshop/5.3-S3-vpc/sm1.png)
-
-3. Click Start Session, và chọn EC2 instance tên **Test-Gateway-Endpoint**. 
-{{% notice info %}}
-Phiên bản EC2 này đã chạy trong "VPC cloud" và sẽ được dùng để kiểm tra khả năng kết nối với Amazon S3 thông qua điểm cuối Cổng mà bạn vừa tạo (s3-gwe). {{% /notice %}}
-
-![Start session](/images/5-Workshop/5.3-S3-vpc/start-session.png)
-
-Session Manager sẽ mở browser tab mới với shell prompt: sh-4.2 $
-
-![Success](/images/5-Workshop/5.3-S3-vpc/start-session-success.png)
-
-Bạn đã bắt đầu phiên kết nối đến EC2 trong VPC Cloud thành công. Trong bước tiếp theo, chúng ta sẽ tạo một  S3 bucket và một tệp trong đó.
-#### Create a file and upload to s3 bucket
-
-1. Đổi về ssm-user's thư mục bằng lệnh "cd ~" 
-
-![Change user's dir](/images/5-Workshop/5.3-S3-vpc/cli1.png)
-
-2. Tạo 1 file để kiểm tra bằng lệnh "fallocate -l 1G testfile.xyz", 1 file tên "testfile.xyz" có kích thước 1GB sẽ được tạo.
-
-![Create file](/images/5-Workshop/5.3-S3-vpc/cli-file.png)
-
-3. Tải file mình vừa tạo lên S3 với lệnh "aws s3 cp testfile.xyz s3://your-bucket-name". Thay your-bucket-name bằng tên S3 bạn đã tạo.
-
-![Uploaded](/images/5-Workshop/5.3-S3-vpc/uploaded.png)
-
-Bạn đã tải thành công tệp lên bộ chứa S3 của mình. Bây giờ bạn có thể kết thúc session.
-
-#### Kiểm tra object trong S3 bucket
-
-1. Đi đến S3 console.  
-2. Click tên s3 bucket của bạn
-3. Trong Bucket console, bạn sẽ thấy tệp bạn đã tải lên S3 bucket của mình
-
-![Check S3](/images/5-Workshop/5.3-S3-vpc/check-s3-bucket.png)
-
-#### Tóm tắt
-
-Chúc mừng bạn đã hoàn thành truy cập S3 từ VPC. Trong phần này, bạn đã tạo gateway endpoint cho Amazon S3 và sử dụng AWS CLI để tải file lên. Quá trình tải lên hoạt động vì gateway endpoint cho phép giao tiếp với S3 mà không cần Internet gateway gắn vào "VPC Cloud". Điều này thể hiện chức năng của gateway endpoint như một đường dẫn an toàn đến S3 mà không cần đi qua pub    lic Internet.
+<!-- INSERT FIGURE 5.5: Ảnh RDS summary và Security Group cho phép PostgreSQL từ EC2 SG. -->
+<!-- INSERT FIGURE 5.6: Output psql cho seed data Role và Category. -->
+### Các bước tạo RDS
+# 1.Engine Settings
+![alt text](../../../../images/5-Workshop/5.3-backend-deploy-ec2-and-rds/5.3.2-configure-rds-postgresql-prisma/1st-step-create-rds-settings-engine.png)
+# 2.Availability and durability
+![alt text](../../../../images/5-Workshop/5.3-backend-deploy-ec2-and-rds/5.3.2-configure-rds-postgresql-prisma/2nd-step-rds-create-settings-availability.png)
+# 3.Settings
+![alt text](../../../../images/5-Workshop/5.3-backend-deploy-ec2-and-rds/5.3.2-configure-rds-postgresql-prisma/3rd-step-rds-create-settings.png)
+# 4.Credentials Settings
+![alt text](../../../../images/5-Workshop/5.3-backend-deploy-ec2-and-rds/5.3.2-configure-rds-postgresql-prisma/4th-step-rds-create-settings-credentials.png)
+# 5.Instance Configs
+![alt text](../../../../images/5-Workshop/5.3-backend-deploy-ec2-and-rds/5.3.2-configure-rds-postgresql-prisma/5th-step-rds-create-instance-config.png)
+# 6.Storage settings
+![alt text](../../../../images/5-Workshop/5.3-backend-deploy-ec2-and-rds/5.3.2-configure-rds-postgresql-prisma/7th-step-rds-create-storage-and-config.png)
+# 7.Connectivity part 1
+![alt text](../../../../images/5-Workshop/5.3-backend-deploy-ec2-and-rds/5.3.2-configure-rds-postgresql-prisma/8th-step-rds-create-connectivity-first-part.png)
+# 8.Connectivity part 2
+![alt text](../../../../images/5-Workshop/5.3-backend-deploy-ec2-and-rds/5.3.2-configure-rds-postgresql-prisma/9th-step-rds-create-connectivity-second-part.png)
+# 9.Connectivity part 3
+![alt text](../../../../images/5-Workshop/5.3-backend-deploy-ec2-and-rds/5.3.2-configure-rds-postgresql-prisma/10th-step-rds-create-connectivity-third-part.png)
+# 10.Monitoring settings
+![alt text](../../../../images/5-Workshop/5.3-backend-deploy-ec2-and-rds/5.3.2-configure-rds-postgresql-prisma/11th-step-rds-create-monitoring.png)
+# 11.Additional config part 1
+![alt text](../../../../images/5-Workshop/5.3-backend-deploy-ec2-and-rds/5.3.2-configure-rds-postgresql-prisma/12th-step-rds-create-additionals-config-first-part.png)
+# 12.Additional config part 2
+![alt text](../../../../images/5-Workshop/5.3-backend-deploy-ec2-and-rds/5.3.2-configure-rds-postgresql-prisma/13th-step-rds-create-additionals-config-second-part.png)
+# 13. Estimated monthly costs
+![alt text](../../../../images/5-Workshop/5.3-backend-deploy-ec2-and-rds/5.3.2-configure-rds-postgresql-prisma/last-of-all-Estimated-monthly-costs.png)

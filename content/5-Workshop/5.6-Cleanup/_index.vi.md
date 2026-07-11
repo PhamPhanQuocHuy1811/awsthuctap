@@ -1,37 +1,42 @@
 ---
-title : "Dọn dẹp tài nguyên"
-date : 2024-01-01
-weight : 6
-chapter : false
-pre : " <b> 5.6. </b> "
+title: "Dọn dẹp, kiểm soát chi phí và hướng phát triển"
+date: 2024-01-01
+weight: 6
+chapter: false
+pre: " <b> 5.6. </b> "
 ---
 
-#### Dọn dẹp tài nguyên
+#### Quyết định thiết kế tiết kiệm chi phí
 
-Xin chúc mừng bạn đã hoàn thành xong lab này!
-Trong lab này, bạn đã học về các mô hình kiến trúc để truy cập Amazon S3 mà không sử dụng Public Internet.
-
-+ Bằng cách tạo Gateway endpoint, bạn đã cho phép giao tiếp trực tiếp giữa các tài nguyên EC2 và Amazon S3, mà không đi qua Internet Gateway.
-Bằng cách tạo Interface endpoint, bạn đã mở rộng kết nối S3 đến các tài nguyên chạy trên trung tâm dữ liệu trên chỗ của bạn thông qua AWS Site-to-Site VPN hoặc Direct Connect.
+- Không dùng NAT Gateway, ALB, Multi-AZ RDS, WAF trả phí hay RDS Proxy — bản demo đã được chạy với footprint nhỏ nhất có thể.
+- Bật AWS Budget alerts để phát hiện chi phí bất thường.
+- CloudFront, Route 53 và ACM có thể dùng, nhưng phải đảm bảo kiểm soát tốt chi phí & nên cập nhật Budget alerts cho mỗi dịch vụ được dùng.
 
 #### Dọn dẹp
-1. Điều hướng đến Hosted Zones trên phía trái của bảng điều khiển Route 53. Nhấp vào tên của  s3.us-east-1.amazonaws.com zone. Nhấp vào Delete và xác nhận việc xóa bằng cách nhập từ khóa "delete".
 
-![hosted zone](/images/5-Workshop/5.6-Cleanup/delete-zone.png)
+- Stop hoặc terminate EC2 instance.
+    + Bước 1: Vào AWS Console -> Search dịch vụ EC2 -> Chọn Instance muốn xóa -> Click vào Instance state -> Terminate (delete) Instance 
+    ![alt text](../../../images/5-Workshop/5.6-cleanup-cost-next-steps/1st-step-click-Instance-state.png)
+    + Bước 2: Ấn delete và xác nhận delete 
+    ![alt text](../../../images/5-Workshop/5.6-cleanup-cost-next-steps/2nd-step-terminate-instance-ec2.png)
 
-2. Disassociate Route 53 Resolver Rule - myS3Rule from "VPC Onprem" and Delete it. 
+- Xóa RDS instance (snapshot lần cuối nếu cần giữ dữ liệu).
+![alt text](../../../images/5-Workshop/5.6-cleanup-cost-next-steps/rds-delete-databases-save-snapshot-if-needed.png)
 
-![hosted zone](/images/5-Workshop/5.6-Cleanup/vpc.png)
+- Empty và xóa S3 bucket, hoặc chỉ giữ các object `products/` cần thiết.
+![alt text](../../../images/5-Workshop/5.6-cleanup-cost-next-steps/first-step-s3-delete.png)
+![alt text](../../../images/5-Workshop/5.6-cleanup-cost-next-steps/second-step-s3-delete-empty-bucket-before-deletion.png)
 
-4.Mở console của CloudFormation và xóa hai stack CloudFormation mà bạn đã tạo cho bài thực hành này:
-+ PLOnpremSetup
-+ PLCloudSetup
+- Gỡ IAM role và inline policy.
+![alt text](../../../images/5-Workshop/5.6-cleanup-cost-next-steps/delete-iam-role.png)
 
-![delete stack](/images/5-Workshop/5.6-Cleanup/delete-stack.png)
+- Xóa project Vercel hoặc tạm dừng deployment, do Vercel là miễn phí nên không cần xóa.
 
-5. Xóa các S3 bucket
+#### Hướng phát triển tiếp theo
 
-+ Mở bảng điều khiển S3
-+ Chọn bucket chúng ta đã tạo cho lab, nhấp chuột và xác nhận là empty. Nhấp Delete và xác nhận delete.
-+ 
-![delete s3](/images/5-Workshop/5.6-Cleanup/delete-s3.png)
+- HTTPS cho backend qua custom domain với proxy, ALB hoặc API Gateway.
+- Presigned URL để download trực tiếp từ S3 có giới hạn thời gian.
+- Chuyển secrets sang SSM Parameter Store hoặc Secrets Manager.
+- CloudWatch logs, metrics và alarms cho backend.
+- Soft delete cho sản phẩm đã có trong đơn hàng.
+- Pipeline CI/CD cho backend và frontend.

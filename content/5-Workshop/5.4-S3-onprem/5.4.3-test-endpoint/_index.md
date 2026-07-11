@@ -1,59 +1,63 @@
 ---
-title : "Test the Interface Endpoint"
-date : 2024-01-01
-weight : 3
-chapter : false
-pre : " <b> 5.4.3 </b> "
+title: "IAM Role and backend code migration to S3"
+date: 2024-01-01
+weight: 3
+chapter: false
+pre: " <b> 5.4.3 </b> "
 ---
 
-#### Get the regional DNS name of S3 interface endpoint
-1. From the Amazon VPC menu, choose Endpoints.
+#### Create the IAM Role for EC2
 
-2. Click the name of newly created endpoint: s3-interface-endpoint. Click details and save the regional DNS name of the endpoint (the first one) to your text-editor for later use. 
+1. Create the role `marketplace-ec2-s3-role` with the **EC2** trusted service.
+2. Attach an inline policy scoped to the product prefix only:
+   - `s3:ListBucket` on `arn:aws:s3:::marketplace-frontend-thao` with condition `s3:prefix = products/*`
+   - `s3:GetObject`, `s3:PutObject`, `s3:DeleteObject` on `arn:aws:s3:::marketplace-frontend-thao/products/*`
+3. Attach the role to the instance via **EC2 > Actions > Security > Modify IAM role**.
+4. Keep **S3 Block Public Access** enabled — the backend accesses S3 through the role, no public objects.
 
-![dns name](/images/5-Workshop/5.4-S3-onprem/dns.png)
+<!-- INSERT FIGURE 5.8: Screenshot of the EC2 instance Security tab showing marketplace-ec2-s3-role attached, and the inline IAM policy. -->
+![alt text](../../../images/5-Workshop/5.4-frontend-deploy-and-s3-storage/5.4.3-iam-role-s3-migration/EC2-IAMRole-Censored.png)
 
+#### Verify the role from EC2 (IMDSv2)
 
-#### Connect to EC2 instance in "VPC On-prem"
-
-1. Navigate to **Session manager** by typing "session manager" in the search box 
-
-2. Click **Start Session**, and select the EC2 instance named **Test-Interface-Endpoint**. This EC2 instance is running in "VPC On-prem" and will be used to test connectivty to Amazon S3 through the Interface endpoint we just created. Session Manager will open a new browser tab with a shell prompt: **sh-4.2 $**
-
-![Start session](/images/5-Workshop/5.4-S3-onprem/start-session.png)
-
-3. Change to the ssm-user's home directory with command "cd ~"
-
-4. Create a file named testfile2.xyz
+```bash
+TOKEN=$(curl -s -X PUT "http://169.254.169.254/latest/api/token" \
+  -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
+curl -s -H "X-aws-ec2-metadata-token: $TOKEN" \
+  http://169.254.169.254/latest/meta-data/iam/security-credentials/
+# Expected output: marketplace-ec2-s3-role
 ```
-fallocate -l 1G testfile2.xyz
+
+#### Test S3 operations with AWS CLI
+
+```bash
+echo "s3 role test" > /tmp/s3-test.txt
+aws s3 cp /tmp/s3-test.txt s3://marketplace-frontend-thao/products/_test/s3-test.txt --region us-east-1
+aws s3 ls s3://marketplace-frontend-thao/products/_test/ --region us-east-1
+aws s3 rm s3://marketplace-frontend-thao/products/_test/s3-test.txt --region us-east-1
 ```
 
-![user](/images/5-Workshop/5.4-S3-onprem/cli1.png)
+#### Backend code changes
 
+| File | Change |
+| --- | --- |
+| `src/config/s3.js` | New helper using `@aws-sdk/client-s3` (upload, get, delete) |
+| `src/middlewares/upload.middleware.js` | Multer `diskStorage` → `memoryStorage` |
+| `src/controllers/product.controller.js` | Upload product file/thumbnail/model to S3; stream from S3 |
+| `src/controllers/library.controller.js` | `GetObject` download after ownership check |
+| `package.json` | Added `@aws-sdk/client-s3` dependency |
 
-5. Copy file to the same S3 bucket we created in section 3.2
+#### Storage key convention
 
+```text
+fileUrl          = <uuid>.docx        -> storageKey = products/<uuid>.docx
+thumbnail        = <uuid>.png         -> storageKey = products/<uuid>.png
+previewModelUrl  = <uuid>.glb         -> storageKey = products/<uuid>.glb
 ```
-aws s3 cp --endpoint-url https://bucket.<Regional-DNS-Name> testfile2.xyz s3://<your-bucket-name>
-``` 
-+ This command requires the --endpoint-url parameter, because you need to use the endpoint-specific DNS name to access S3 using an Interface endpoint.
-+ Do not include the leading ' * ' when copying/pasting the regional DNS name.
-+ Provide your S3 bucket name created earlier
 
-![copy file](/images/5-Workshop/5.4-S3-onprem/cli2.png)
+#### Migrate legacy files
 
-
-Now the file has been added to your S3 bucket. Let check your S3 bucket in the next step.
-
-#### Check Object in S3 bucket
-
-1. Navigate to S3 console
-2. Click Buckets
-3. Click the name of your bucket and you will see testfile2.xyz has been added to your bucket
-
-![check bucket](/images/5-Workshop/5.4-S3-onprem/check-bucket.png)
-
-
-
-
+```bash
+cd ~/daiai-aws-MarketplaceV1/backend
+aws s3 sync storage/products/ s3://marketplace-frontend-thao/products/ --region us-east-1
+```

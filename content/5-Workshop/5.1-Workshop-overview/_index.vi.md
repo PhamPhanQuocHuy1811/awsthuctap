@@ -1,19 +1,33 @@
 ---
-title : "Giới thiệu"
-date : 2024-01-01 
-weight : 1
-chapter : false
-pre : " <b> 5.1. </b> "
+title: "Tổng quan Workshop"
+date: 2024-01-01
+weight: 1
+chapter: false
+pre: " <b> 5.1. </b> "
 ---
 
-#### Giới thiệu về VPC Endpoint
+#### Mục tiêu dự án
 
-+ Điểm cuối VPC (endpoint) là thiết bị ảo. Chúng là các thành phần VPC có thể mở rộng theo chiều ngang, dự phòng và có tính sẵn sàng cao. Chúng cho phép giao tiếp giữa tài nguyên điện toán của bạn và dịch vụ AWS mà không gây ra rủi ro về tính sẵn sàng.
-+ Tài nguyên điện toán đang chạy trong VPC có thể truy cập Amazon S3 bằng cách sử dụng điểm cuối Gateway. Interface Endpoint  PrivateLink có thể được sử dụng bởi tài nguyên chạy trong VPC hoặc tại TTDL.
+**DaiMarket** là nền tảng marketplace dành cho sản phẩm số như tài liệu PDF/Word và mô hình 3D. Hệ thống cho phép người dùng xem danh sách sản phẩm, xem chi tiết, xem trước mô hình 3D hoặc tài liệu mẫu, mua sản phẩm và truy cập sản phẩm đã mua trong thư viện cá nhân.
 
-#### Tổng quan về workshop
-Trong workshop này, bạn sẽ sử dụng hai VPC.
-+ **"VPC Cloud"** dành cho các tài nguyên cloud như Gateway endpoint và EC2 instance để kiểm tra.
-+ **"VPC On-Prem"** mô phỏng môi trường truyền thống như nhà máy hoặc trung tâm dữ liệu của công ty. Một EC2 Instance chạy phần mềm StrongSwan VPN đã được triển khai trong "VPC On-prem" và được cấu hình tự động để thiết lập đường hầm VPN Site-to-Site với AWS Transit Gateway. VPN này mô phỏng kết nối từ một vị trí tại TTDL (on-prem) với AWS cloud. Để giảm thiểu chi phí, chỉ một phiên bản VPN được cung cấp để hỗ trợ workshop này. Khi lập kế hoạch kết nối VPN cho production workloads của bạn, AWS khuyên bạn nên sử dụng nhiều thiết bị VPN để có tính sẵn sàng cao.
+<img alt="hosted zone" src="../../../images/5-Workshop/5.1-workshop-overview/project_architecture.png">
 
-![overview](/images/5-Workshop/5.1-Workshop-overview/diagram1.png)
+#### Kiến trúc đã triển khai
+
+| Tầng | Dịch vụ / công nghệ | Vai trò trong hệ thống |
+| --- | --- | --- |
+| Frontend | Vercel / React + Vite | Phục vụ giao diện web, SPA routing và bản build frontend. |
+| API | Amazon EC2 / Node.js, Express, PM2 | Chạy các route backend cho auth, products, admin, orders, webhook và library. |
+| Database | Amazon RDS / PostgreSQL | Lưu users, roles, categories, products, orders, order items, payment methods, seller data và trạng thái mua hàng. |
+| Storage | Amazon S3 | Lưu tài sản sản phẩm như thumbnail, document, file gốc và 3D preview model. |
+| Security | IAM Role | Cho phép EC2 PutObject, GetObject, DeleteObject và ListBucket trong phạm vi prefix S3 đã cấu hình. |
+| Payment | SePay webhook | Nhận thông báo chuyển khoản và cập nhật đơn hàng từ PENDING sang SUCCESS. |
+
+#### Ghi chú kiến trúc
+
+- Kiến trúc mục tiêu ban đầu có **CloudFront, Route 53, WAF** và có thể dùng **Secrets Manager**. Trong bản demo thực tế, **Vercel thay CloudFront** vì tài khoản AWS chưa được xác minh để tạo CloudFront distribution.
+- Backend vẫn chạy trên AWS EC2 và sử dụng **RDS + S3 + IAM Role** — đây là các dịch vụ AWS quan trọng nhất của phần triển khai hiện tại.
+- **S3 Block Public Access** luôn được bật. File sản phẩm không public; backend kiểm tra quyền sở hữu trước khi stream file về trình duyệt.
+- Hiện tại backend stream file từ S3. Cải tiến production sau này là tạo **presigned URL** ngắn hạn sau khi đã kiểm tra quyền sở hữu.
+
+<!-- INSERT FIGURE 5.1: Sơ đồ kiến trúc triển khai sử dụng Vercel hoặc CloudFront cho frontend, EC2 backend, RDS PostgreSQL, S3 private product storage, IAM Role và SePay webhook. -->

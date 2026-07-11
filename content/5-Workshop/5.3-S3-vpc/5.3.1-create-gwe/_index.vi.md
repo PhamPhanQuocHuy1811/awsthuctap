@@ -1,40 +1,58 @@
 ---
-title : "Tạo một Gateway Endpoint"
-date : 2024-01-01 
-weight : 1
-chapter : false
-pre : " <b> 5.3.1 </b> "
+title: "Tạo và cấu hình EC2 backend"
+date: 2024-01-01
+weight: 1
+chapter: false
+pre: " <b> 5.3.1 </b> "
 ---
 
-1. Mở [Amazon VPC console](https://us-east-1.console.aws.amazon.com/vpc/home?region=us-east-1#Home:)
-2. Trong thanh điều hướng, chọn **Endpoints**, click **Create Endpoint**:
+#### Các bước
 
-{{% notice note %}}
-Bạn sẽ thấy 6 điểm cuối VPC hiện có hỗ trợ AWS Systems Manager (SSM). Các điểm cuối này được Mẫu CloudFormation triển khai tự động cho workshop này.
-{{% /notice %}}
+- Tạo **Ubuntu EC2 instance** ở region us-east-1.
+- Cấu hình Security Group: SSH 22 từ My IP; port 5000 để test backend HTTP; nếu production cần thay bằng HTTPS/domain.
+- Kết nối bằng SSH hoặc MobaXterm với user `ubuntu` và private key đúng.
+- Cài Git, Node.js 22, npm, PM2, PostgreSQL client và AWS CLI v2.
+- Clone/pull GitHub repository và cài dependency cho backend.
+- Khởi động backend bằng PM2 và lưu startup config.
 
-![endpoint](/images/5-Workshop/5.3-S3-vpc/endpoints.png)
+![alt text](../../../../images/5-Workshop/5.3-backend-deploy-ec2-and-rds/5.3.1-create-configure-ec2-backend/1st-step-create-ec2-Instance-type.png)
+![alt text](../../../../images/5-Workshop/5.3-backend-deploy-ec2-and-rds/5.3.1-create-configure-ec2-backend/2nd-step-create-ec2-add-security-group-rules.png)
+![alt text](../../../../images/5-Workshop/5.3-backend-deploy-ec2-and-rds/5.3.1-create-configure-ec2-backend/successfully-launch-instance.png)
+<!--chèn hình ảnh các bước tạo ec2-->
 
-3. Trong Create endpoint console:
-+ Đặt tên cho endpoint: s3-gwe
-+ Trong service category, chọn **aws services**
+```bash
+# Cài đặt server
+sudo apt update && sudo apt upgrade -y
+curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
+sudo apt install -y nodejs git postgresql-client unzip curl
+sudo npm install -g pm2
 
-![endpoint](/images/5-Workshop/5.3-S3-vpc/create-s3-gwe1.png)
+# AWS CLI v2 nếu apt không có sẵn package
+cd /tmp
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+unzip -q awscliv2.zip
+sudo ./aws/install
+aws --version
 
-+ Trong **Services**, gõ "s3" trong hộp tìm kiếm và chọn dịch vụ với loại **gateway**
+# Chạy backend
+cd ~/daiai-aws-MarketplaceV1/backend
+npm install
+pm2 start server.js --name marketplace-backend
+pm2 save
+pm2 startup
+```
 
-![endpoint](/images/5-Workshop/5.3-S3-vpc/services.png)
+#### Kiểm tra
 
-+ Đối với VPC, chọn **VPC Cloud** từ drop-down menu.
-+ Đối với Route tables, chọn bảng định tuyến mà đã liên kết với 2 subnets (lưu ý: đây không phải là bảng định tuyến chính cho VPC mà là bảng định tuyến thứ hai do CloudFormation tạo).
+```bash
+pm2 status
+pm2 logs marketplace-backend --lines 80
+curl http://localhost:5000/health
+curl http://localhost:5000/api/products
+```
+* Test pm2 status
+![alt text](../../../../images/5-Workshop/5.3-backend-deploy-ec2-and-rds/5.3.1-create-configure-ec2-backend/pm2-status.png)
+* Test pm2 logs
+![alt text](../../../../images/5-Workshop/5.3-backend-deploy-ec2-and-rds/5.3.1-create-configure-ec2-backend/pm2-logs-marketplace-backend.png)
 
-![endpoint](/images/5-Workshop/5.3-S3-vpc/vpc.png)
-
-+ Đối với Policy, để tùy chọn mặc định là Full access để cho phép toàn quyền truy cập vào dịch vụ. Bạn sẽ triển khai VPC endpoint policy trong phần sau để chứng minh việc hạn chế quyền truy cập vào S3 bucket dựa trên các policies.
-
-![endpoint](/images/5-Workshop/5.3-S3-vpc/policy.png)
-
-+ Không thêm tag vào VPC endpoint.
-+ Click Create endpoint, click x sau khi nhận được thông báo tạo thành công.
-
-![endpoint](/images/5-Workshop/5.3-S3-vpc/complete.png)
+<!-- INSERT FIGURE 5.4: Ảnh PM2 status và kết quả /health. Nếu báo cáo public, che public IP. -->

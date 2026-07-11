@@ -1,20 +1,25 @@
 ---
-title : "Access S3 from on-premises"
-date : 2024-01-01
-weight : 4
-chapter : false
-pre : " <b> 5.4. </b> "
+title: "Frontend deployment and S3 product storage"
+date: 2024-01-01
+weight: 4
+chapter: false
+pre: " <b> 5.4. </b> "
 ---
 
-#### Overview
+The frontend was initially planned for S3 + CloudFront. Because CloudFront creation was blocked by AWS account verification, the actual demo uses **Vercel** for the frontend while keeping **S3** for product assets. The architecture diagram therefore shows **"Vercel or CloudFront"** as frontend delivery options.
 
-+ In this section, you will create an Interface endpoint to access Amazon S3 from a simulated on-premises environment. The Interface endpoint will allow you to route to Amazon S3 over a VPN connection from your simulated on-premises environment.
+This section also covers the most important storage improvement of the workshop: migrating product files from EC2 local storage to **Amazon S3**. Before the migration, uploaded product files were stored in `backend/storage/products` on the EC2 instance. After the migration, new product files are uploaded to S3 under the `products/` prefix.
 
-+ Why using **Interface endpoint**: 
-    + Gateway endpoints only work with resources running in the VPC where they are created. Interface endpoints work with resources running in VPC, and also resources running in on-premises environments. Connectivty from your on-premises environment to the cloud can be provided by AWS Site-to-Site VPN or AWS Direct Connect.
-    + Interface endpoints allow you to connect to services powered by AWS PrivateLink. These services include some AWS services, services hosted by other AWS customers and partners in their own VPCs (referred to as PrivateLink Endpoint Services), and supported AWS Marketplace Partner services. For this workshop, we will focus on connecting to Amazon S3.
+#### Why S3
 
-![Interface endpoint architecture](/images/5-Workshop/5.4-S3-onprem/diagram3.png)
+- S3 separates product file storage from backend compute.
+- S3 avoids losing product files during code pulls, instance replacement, or local disk changes.
+- S3 provides scalable object storage for documents, images, thumbnails, and 3D models.
+- Files remain private because S3 Block Public Access is enabled and access goes through the backend.
 
+#### Content
 
-
+- [Deploy frontend to Vercel](5.4.1-deploy-frontend-vercel/)
+- [API rewrite and webhook forwarding](5.4.2-api-rewrite-webhook-forwarding/)
+- [IAM Role and backend code migration to S3](5.4.3-iam-role-s3-migration/)
+- [Testing S3 upload, preview, and download](5.4.4-test-s3-upload-preview-download/)

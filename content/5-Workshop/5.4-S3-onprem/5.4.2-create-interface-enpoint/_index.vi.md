@@ -1,43 +1,36 @@
 ---
-title : "Tạo một S3 Interface endpoint"
-date : 2024-01-01
-weight : 2
-chapter : false
-pre : " <b> 5.4.2 </b> "
+title: "API rewrite và webhook forwarding"
+date: 2024-01-01
+weight: 2
+chapter: false
+pre: " <b> 5.4.2 </b> "
 ---
 
-Trong phần này, bạn sẽ tạo và kiểm tra Interface Endpoint  S3 bằng cách sử dụng môi trường truyền thống mô phỏng.
+#### Định tuyến API
 
-1. Quay lại Amazon VPC menu. Trong thanh điều hướng bên trái, chọn Endpoints, sau đó click Create Endpoint.
+Frontend cần gọi API bằng relative path như `/api/products` và `/api/auth/login`. Nếu bundle production còn gọi `localhost:3000` hoặc `localhost:5000` thì trình duyệt sẽ gọi về máy người dùng, gây **Network Error**. Bundle production đã được sửa để chỉ dùng relative path `/api/...`.
 
-2. Trong Create endpoint console:
-+ Đặt tên interface endpoint
-+ Trong Service category, chọn **aws services** 
+#### Forward webhook SePay
 
-![name](/images/5-Workshop/5.4-S3-onprem/s3-interface-endpoint1.png)
+Link ngrok cũ được thay bằng domain HTTPS đã deploy. Vercel forward request webhook về backend EC2.
 
-3.  Trong Search box, gõ S3 và nhấn Enter. Chọn endpoint có tên com.amazonaws.us-east-1.s3. Đảm bảo rằng cột Type có giá trị Interface.
+```text
+SePay webhook URL đại loại sẽ trông như thế này nếu setup đúng:
+https://daiai-aws.vercel.app/webhook/sepay
 
-![service](/images/5-Workshop/5.4-S3-onprem/s3-interface-endpoint2.png)
+Backend route:
+POST /webhook/sepay
+Authorization: Apikey <SEPAY_API_KEY>
+```
 
-4. Đối với VPC, chọn VPC Cloud từ drop-down.
-{{% notice warning %}}
-Đảm bảo rằng bạn chọn "VPC Cloud" và không phải "VPC On-prem"
-{{% /notice %}}
-+ Mở rộng **Additional settings** và đảm bảo rằng Enable DNS name *không* được chọn (sẽ sử dụng điều này trong phần tiếp theo của workshop)
+#### Kiểm tra
 
-![vpc](/images/5-Workshop/5.4-S3-onprem/s3-interface-endpoint3.png)
-
-5. Chọn 2 subnets trong AZs sau: us-east-1a and us-east-1b
-
-![subnets](/images/5-Workshop/5.4-S3-onprem/s3-interface-endpoint4.png)
-
-6. Đối với Security group, chọn SGforS3Endpoint:
-
-![sg](/images/5-Workshop/5.4-S3-onprem/s3-interface-endpoint5.png)
-
-7. Giữ default policy - full access và click Create endpoint
-
-![success](/images/5-Workshop/5.4-S3-onprem/s3-interface-endpoint-success.png)
-
-Chúc mừng bạn đã tạo thành công S3 interface endpoint. Ở bước tiếp theo, chúng ta sẽ kiểm tra interface endpoint.
+Để tiện cho việc kiểm tra, khi sử dụng lệnh dưới đây có thể test product nếu đã setup thành công backend trong EC2
+```bash
+curl https://daiai-aws.vercel.app/api/products
+curl http://localhost:5000/api/products
+# Kiểm tra trên browser:
+# - Register/Login
+# - Product listing
+# - Admin routes có Authorization header
+```

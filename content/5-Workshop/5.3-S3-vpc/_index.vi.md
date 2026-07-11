@@ -1,18 +1,23 @@
 ---
-title : "Truy cập S3 từ VPC"
-date : 2024-01-01 
-weight : 3
-chapter : false
-pre : " <b> 5.3. </b> "
+title: "Triển khai backend với EC2 và RDS"
+date: 2024-01-01
+weight: 3
+chapter: false
+pre: " <b> 5.3. </b> "
 ---
 
-#### Sử dụng Gateway endpoint
+Phần này mô tả cách backend được deploy lên **Amazon EC2** và kết nối **Amazon RDS PostgreSQL**. Backend là tầng tin cậy dùng để validate JWT, kiểm tra role, thao tác với RDS và stream file S3 sau khi xác thực quyền truy cập.
 
-Trong phần này, bạn sẽ tạo một Gateway endpoint để truy cập Amazon S3 từ một EC2 instance. Gateway endpoint sẽ cho phép tải một object lên S3 bucket mà không cần sử dụng Internet Công cộng. Để tạo endpoint, bạn phải chỉ định VPC mà bạn muốn tạo endpoint và dịch vụ (trong trường hợp này là S3) mà bạn muốn thiết lập kết nối.
+#### Dịch vụ backend
 
-![overview](/images/5-Workshop/5.3-S3-vpc/diagram2.png)
+- **Amazon EC2** host Express backend.
+- **PM2** giữ tiến trình Node.js chạy với tên `marketplace-backend`.
+- **Amazon RDS PostgreSQL** lưu dữ liệu quan hệ.
+- **Prisma 7** với `@prisma/adapter-pg` dùng để truy cập database.
+- Backend expose các route `/health`, `/api/auth`, `/api/products`, `/api/categories`, `/api/orders`, `/api/library`, `/api/admin`, `/api/withdrawals` và `/webhook`.
 
+![alt text](../../../images/5-Workshop/5.3-backend-deploy-ec2-and-rds/5.3.2-configure-rds-postgresql-prisma/rds-summary.png)
 #### Nội dung
 
-- [Tạo gateway endpoint](3.1-create-gwe/)
-- [Test gateway endpoint](3.2-test-gwe/)
+- [Tạo và cấu hình EC2 backend](5.3.1-create-configure-ec2-backend/)
+- [Cấu hình RDS PostgreSQL và Prisma](5.3.2-configure-rds-postgresql-prisma/)

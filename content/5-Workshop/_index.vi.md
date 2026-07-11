@@ -6,28 +6,28 @@ chapter: false
 pre: " <b> 5. </b> "
 ---
 
-{{% notice warning %}}
-⚠️ **Lưu ý:** Các thông tin dưới đây chỉ nhằm mục đích tham khảo, vui lòng **không sao chép nguyên văn** cho bài báo cáo của bạn kể cả warning này.
-{{% /notice %}}
-
-
-# Đảm bảo truy cập Hybrid an toàn đến S3 bằng cách sử dụng VPC endpoint
+# Sàn thương mại sản phẩm số trên Cloud với xem trước 3D — DaiMarket
 
 #### Tổng quan
 
-**AWS PrivateLink** cung cấp kết nối riêng tư đến các dịch vụ aws từ VPCs hoặc trung tâm dữ liệu (on-premise) mà không làm lộ lưu lượng truy cập ra ngoài public internet.
+Phần Workshop này ghi lại quá trình triển khai và kiểm thử thực tế của hệ thống marketplace sản phẩm số trên cloud — **DaiMarket**. Dự án hỗ trợ bán tài liệu PDF/Word và mô hình 3D, có xem trước 3D trên trình duyệt, xác nhận thanh toán qua SePay và lưu trữ tài sản sản phẩm trên Amazon S3.
 
-Trong bài lab này, chúng ta sẽ học cách tạo, cấu hình, và kiểm tra VPC endpoints để cho phép workload của bạn tiếp cận các dịch vụ AWS mà không cần đi qua Internet công cộng.
+Workshop tập trung vào việc đưa ứng dụng từ môi trường phát triển lên môi trường cloud tiết kiệm chi phí. Kiến trúc đang chạy thực tế sử dụng **Vercel** cho frontend, **Amazon EC2** cho backend Node.js/Express, **Amazon RDS PostgreSQL** cho dữ liệu quan hệ, **Amazon S3** cho file sản phẩm và **IAM Role** để EC2 truy cập S3 an toàn.
 
-Chúng ta sẽ tạo hai loại endpoints để truy cập đến Amazon S3: gateway vpc endpoint và interface vpc endpoint. Hai loại vpc endpoints này mang đến nhiều lợi ích tùy thuộc vào việc bạn truy cập đến S3 từ môi trường cloud hay từ trung tâm dữ liệu (on-premise).
-+ **Gateway** - Tạo gateway endpoint để gửi lưu lượng đến Amazon S3 hoặc DynamoDB using private IP addresses. Bạn điều hướng lưu lượng từ VPC của bạn đến gateway endpoint bằng các bảng định tuyến (route tables)
-+ **Interface** - Tạo interface endpoint để gửi lưu lượng đến các dịch vụ điểm cuối (endpoints) sử dụng Network Load Balancer để phân phối lưu lượng. Lưu lượng dành cho dịch vụ điểm cuối được resolved bằng DNS.
+- **Frontend:** React + Vite triển khai trên Vercel. CloudFront là phương án thay thế/mục tiêu tương lai, nhưng chưa dùng trong demo do tài khoản AWS chưa được xác minh để tạo CloudFront.
+- **Backend:** Node.js + Express + Prisma 7 chạy trên EC2 bằng PM2.
+- **Database:** Amazon RDS PostgreSQL lưu users, roles, products, categories, orders, payment methods và quyền sở hữu trong library.
+- **Object storage:** S3 bucket `marketplace-frontend-thao`, prefix `products/` dùng để lưu file sản phẩm riêng tư.
+- **Security:** IAM Role `marketplace-ec2-s3-role` gắn cho EC2, cấp quyền tối thiểu với prefix `products/`.
+- **Payment:** SePay webhook nhận thông báo giao dịch và cập nhật trạng thái đơn hàng.
+
+<!-- INSERT FIGURE 5.0: Sơ đồ kiến trúc mới có khối 'Vercel hoặc CloudFront', EC2 backend, RDS PostgreSQL, S3 Product Assets, IAM Role và SePay webhook. -->
 
 #### Nội dung
 
-1. [Tổng quan về workshop](5.1-Workshop-overview/)
-2. [Chuẩn bị](5.2-Prerequiste/)
-3. [Truy cập đến S3 từ VPC](5.3-S3-vpc/)
-4. [Truy cập đến S3 từ TTDL On-premises](5.4-S3-onprem/)
-5. [VPC Endpoint Policies (làm thêm)](5.5-Policy/)
-6. [Dọn dẹp tài nguyên](5.6-Cleanup/)
+1. [Tổng quan Workshop](5.1-Workshop-overview/)
+2. [Điều kiện chuẩn bị](5.2-prerequisite/)
+3. [Triển khai backend với EC2 và RDS](5.3-backend-deploy-ec2-and-rds/)
+4. [Triển khai frontend và lưu trữ sản phẩm trên S3](5.4-frontend-deploy-and-s3-storage/)
+5. [Thanh toán, kiểm thử admin và kiểm thử hệ thống](5.5-payment-admin-system-testing/)
+6. [Dọn dẹp, kiểm soát chi phí và hướng phát triển](5.6-cleanup-cost-next-steps/)
