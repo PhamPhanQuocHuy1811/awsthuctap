@@ -6,13 +6,13 @@ chapter: false
 pre: " <b> 6. </b> "
 ---
 
-Trong thời gian thực tập tại **Công ty TNHH Amazon Web Services Việt Nam** từ ngày **15/04/2026** đến **15/07/2026**, tôi đã có cơ hội học tập, thực hành và áp dụng kiến thức đã học vào môi trường làm việc thực tế. Tôi đã tham gia **phát triển và kiểm thử dự án DaiMarket**, qua đó nâng cao kỹ năng lập trình, phân tích, viết báo cáo, ứng biến và giải quyết vấn đề.
+Trong thời gian thực tập tại **Công ty TNHH Amazon Web Services Việt Nam** từ ngày **17/04/2026** đến **30/07/2026**, tôi đã có cơ hội học tập, thực hành và áp dụng kiến thức đã học vào môi trường làm việc thực tế. Tôi đã tham gia **phát triển và kiểm thử dự án DaiMarket**, qua đó nâng cao kỹ năng lập trình, phân tích, viết báo cáo, ứng biến và giải quyết vấn đề.
 
 Về đạo đức nghề nghiệp, tôi luôn cố gắng hoàn thành tốt công việc, tuân thủ các quy định tại nơi làm việc và tích cực hợp tác với đồng nghiệp để nâng cao hiệu quả công việc.
 
 Để đánh giá một cách khách quan về thời gian thực tập của mình, tôi muốn tự đánh giá bản thân dựa trên các tiêu chí sau:
 
-| KHÔNG. | Tiêu chuẩn | Sự miêu tả | Tốt | khá | Trung bình |
+| KHÔNG. | Tiêu chuẩn | Sự miêu tả | Tốt | Khá | Trung bình |
 | :--- | :--- | :--- | :---: | :---: | :---: |
 | 1 | **Kiến thức và kỹ năng chuyên môn** | Hiểu biết sâu rộng về lĩnh vực, áp dụng kiến thức vào thực tiễn, thành thạo sử dụng công cụ, chất lượng công việc. | ☐ | ✅ | ☐ |
 | 2 | **Khả năng học hỏi** | Khả năng tiếp thu kiến thức mới và học hỏi nhanh chóng | ☐ | ✅ | ☐ |

@@ -19,9 +19,9 @@ chapter: false
 
 &emsp; **Lớp:** 22DTHA6
 
-&emsp; **Công ty thực tập:** Công ty TNHH Amazon Web Services Viet Nam
+&emsp; **Công ty thực tập:** Công ty TNHH Amazon Web Services Việt Nam
 
-&emsp; **Vị trí thực tập:** Cloud Engineer- First Cloud AI Journey
+&emsp; **Vị trí thực tập:** FCJ Cloud Intern
 
 &emsp; **Thời gian thực tập:** Từ ngày 17/4/2026 đến ngày 30/7/2026
 

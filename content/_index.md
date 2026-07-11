@@ -22,7 +22,7 @@ chapter: false
 
 &emsp; **Internship Company:** Amazon Web Services Viet Nam Company Limited
 
-&emsp; **Internship Position:** Cloud Engineer - First Cloud AI Journey
+&emsp; **Internship Position:** FCJ Cloud Intern
 
 &emsp; **Internship Duration:** From 17/04/2026 to 30/7/2026
 
