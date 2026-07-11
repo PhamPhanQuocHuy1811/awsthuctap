@@ -22,8 +22,8 @@ RETURNING id, email, "roleId";
 Product category must match the file type: categories in the **DOCUMENT** group accept document files, categories in the **MODEL_3D** group accept 3D model files.
 
 <!-- INSERT FIGURE 5.11: Screenshot of the admin dashboard showing product approval and category group validation. -->
-![alt text](../../images/5-Workshop/5.5-payment-admin-system-testing/add-category.png)
-![alt text](../../images/5-Workshop/5.5-payment-admin-system-testing/add-san-pham.png)
+![](1.png)
+![](2.png)
 
 #### SePay payment flow
 
@@ -32,8 +32,8 @@ Product category must match the file type: categories in the **DOCUMENT** group 
 - On a matching webhook, the order transitions **PENDING → SUCCESS** and the buyer gains library access through the related `OrderItem` records.
 
 <!-- INSERT FIGURE 5.12: Screenshot of a SePay webhook delivery and the order status changing from PENDING to SUCCESS. -->
-![alt text](../../images/5-Workshop/5.5-payment-admin-system-testing/noi-dung-chuyen-khoan.png)
-![alt text](../../images/5-Workshop/5.5-payment-admin-system-testing/thanh-toan-thanh-cong.png)
+![](3.png)
+![](4.png)
 
 #### Known issue: deleting purchased products
 

@@ -16,19 +16,19 @@ pre: " <b> 5.6. </b> "
 
 - Stop hoặc terminate EC2 instance.
     + Bước 1: Vào AWS Console -> Search dịch vụ EC2 -> Chọn Instance muốn xóa -> Click vào Instance state -> Terminate (delete) Instance 
-    ![alt text](../../../images/5-Workshop/5.6-cleanup-cost-next-steps/1st-step-click-Instance-state.png)
+    ![](1.png)
     + Bước 2: Ấn delete và xác nhận delete 
-    ![alt text](../../../images/5-Workshop/5.6-cleanup-cost-next-steps/2nd-step-terminate-instance-ec2.png)
+    ![](2.png)
 
 - Xóa RDS instance (snapshot lần cuối nếu cần giữ dữ liệu).
-![alt text](../../../images/5-Workshop/5.6-cleanup-cost-next-steps/rds-delete-databases-save-snapshot-if-needed.png)
+![](3.png)
 
 - Empty và xóa S3 bucket, hoặc chỉ giữ các object `products/` cần thiết.
-![alt text](../../../images/5-Workshop/5.6-cleanup-cost-next-steps/first-step-s3-delete.png)
-![alt text](../../../images/5-Workshop/5.6-cleanup-cost-next-steps/second-step-s3-delete-empty-bucket-before-deletion.png)
+![](4.png)
+![](5.png)
 
 - Gỡ IAM role và inline policy.
-![alt text](../../../images/5-Workshop/5.6-cleanup-cost-next-steps/delete-iam-role.png)
+![](6.png)
 
 - Xóa project Vercel hoặc tạm dừng deployment, do Vercel là miễn phí nên không cần xóa.
 

@@ -43,9 +43,9 @@ aws s3 ls s3://marketplace-frontend-thao/products/ --region us-east-1 | tail -20
 
 <!-- INSERT FIGURE 5.9: Ảnh S3 console liệt kê object mới trong products/ sau khi upload từ web app. -->
 ### Demo images of the products inside the S3 bucket.
-![alt text](../../../../images/5-Workshop/5.4-frontend-deploy-and-s3-storage/5.4.4-test-s3-upload-preview-download/S3-products-after-upload-to-S3.png)
+![](1.png)
 <!-- INSERT FIGURE 5.10: Ảnh trình duyệt hiển thị thumbnail sản phẩm, preview 3D và download thành công từ library. -->
 ### Frontend demo
-![alt text](../../../images/5-Workshop/5.4-frontend-deploy-and-s3-storage/5.4.4-test-s3-upload-preview-download/Web-preview-all-product-with-thumbnail.png)
-![alt text](../../../images/5-Workshop/5.4-frontend-deploy-and-s3-storage/5.4.4-test-s3-upload-preview-download/Web-preview-3d-product.png)
-![alt text](../../../images/5-Workshop/5.4-frontend-deploy-and-s3-storage/5.4.4-test-s3-upload-preview-download/Web-preview-for-pdf-file.png)
+![](2.png)
+![](3.png)
+![](4.png)

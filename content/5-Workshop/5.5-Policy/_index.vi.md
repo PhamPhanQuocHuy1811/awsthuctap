@@ -22,8 +22,8 @@ RETURNING id, email, "roleId";
 Category của sản phẩm phải khớp với loại file: category thuộc nhóm **DOCUMENT** nhận file tài liệu, category thuộc nhóm **MODEL_3D** nhận file mô hình 3D. 
 
 <!-- INSERT FIGURE 5.11: Ảnh admin dashboard hiển thị duyệt sản phẩm và validation theo category group. -->
-![alt text](../../../images/5-Workshop/5.5-payment-admin-system-testing/add-category.png)
-![alt text](../../../images/5-Workshop/5.5-payment-admin-system-testing/add-san-pham.png)
+![](1.png)
+![](2.png)
 
 #### Luồng thanh toán SePay
 
@@ -32,8 +32,8 @@ Category của sản phẩm phải khớp với loại file: category thuộc nh
 - Khi webhook khớp, đơn hàng chuyển **PENDING → SUCCESS** và buyer được cấp quyền library qua các bản ghi `OrderItem` liên quan.
 
 <!-- INSERT FIGURE 5.12: Ảnh webhook SePay được gửi và trạng thái đơn hàng chuyển từ PENDING sang SUCCESS. -->
-![alt text](../../../images/5-Workshop/5.5-payment-admin-system-testing/noi-dung-chuyen-khoan.png)
-![alt text](../../../images/5-Workshop/5.5-payment-admin-system-testing/thanh-toan-thanh-cong.png)
+![](3.png)
+![](4.png)
 
 #### Vấn đề đã biết: xóa sản phẩm đã được mua
 

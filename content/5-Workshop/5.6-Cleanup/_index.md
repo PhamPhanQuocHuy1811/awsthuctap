@@ -16,19 +16,19 @@ pre: " <b> 5.6. </b> "
 
 - Stop or terminate the EC2 instance.    
     + Step 1: Go to AWS Console -> Search EC2 service -> Select the Instance you want to delete -> Click on Instance state -> Terminate (delete) Instance
-    ![alt text](../../images/5-Workshop/5.6-cleanup-cost-next-steps/1st-step-click-Instance-state.png)
+    ![](1.png)
     + Step 2: Press delete and confirm deletion
-    ![alt text](../../images/5-Workshop/5.6-cleanup-cost-next-steps/2nd-step-terminate-instance-ec2.png)
+    ![](2.png)
 
 - Delete the RDS instance (take a final snapshot if the data is needed later).
-![alt text](../../images/5-Workshop/5.6-cleanup-cost-next-steps/rds-delete-databases-save-snapshot-if-needed.png)
+![](3.png)
 
 - Empty and delete the S3 bucket, or keep only the `products/` objects that matter.
-![alt text](../../images/5-Workshop/5.6-cleanup-cost-next-steps/first-step-s3-delete.png)
-![alt text](../../images/5-Workshop/5.6-cleanup-cost-next-steps/second-step-s3-delete-empty-bucket-before-deletion.png)
+![](4.png)
+![](5.png)
 
 - Remove the IAM role and inline policy.
-![alt text](../../images/5-Workshop/5.6-cleanup-cost-next-steps/delete-iam-role.png)
+![](6.png)
 
 - Delete the Vercel project or pause deployments, since Vercel is free, deletion may not be necessary.
 

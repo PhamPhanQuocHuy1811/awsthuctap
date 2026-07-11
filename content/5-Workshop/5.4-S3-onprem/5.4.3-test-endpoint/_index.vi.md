@@ -16,7 +16,7 @@ pre: " <b> 5.4.3 </b> "
 4. Giữ nguyên **S3 Block Public Access** — backend truy cập S3 qua role, không có object public.
 
 <!-- INSERT FIGURE 5.8: Ảnh tab Security của EC2 instance hiển thị marketplace-ec2-s3-role đã gắn, và inline IAM policy. -->
-![alt text](../../../../images/5-Workshop/5.4-frontend-deploy-and-s3-storage/5.4.3-iam-role-s3-migration/EC2-IAMRole-Censored.png)
+![](image.png)
 
 #### Kiểm tra role từ EC2 (IMDSv2)
 

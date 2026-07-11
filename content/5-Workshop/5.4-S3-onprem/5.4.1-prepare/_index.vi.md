@@ -17,7 +17,7 @@ pre: " <b> 5.4.1 </b> "
 | Output directory | `dist` |
 | Production domain | `https://daiai-aws.vercel.app` |
 
-![alt text](<../../../../images/5-Workshop/5.4-frontend-deploy-and-s3-storage/5.4.1-deploy-frontend-vercel/Create vercel.png>)
+![](image.png)
 
 #### Fix SPA routing
 

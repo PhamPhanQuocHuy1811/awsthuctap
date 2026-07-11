@@ -16,7 +16,7 @@ pre: " <b> 5.4.3 </b> "
 4. Keep **S3 Block Public Access** enabled — the backend accesses S3 through the role, no public objects.
 
 <!-- INSERT FIGURE 5.8: Screenshot of the EC2 instance Security tab showing marketplace-ec2-s3-role attached, and the inline IAM policy. -->
-![alt text](../../../images/5-Workshop/5.4-frontend-deploy-and-s3-storage/5.4.3-iam-role-s3-migration/EC2-IAMRole-Censored.png)
+![](image.png)
 
 #### Verify the role from EC2 (IMDSv2)
 
