@@ -1,95 +1,81 @@
 ---
 title: "Blog 1"
-date: 2026-07-10
+date: 2024-01-01
 weight: 1
 chapter: false
 pre: " <b> 3.1. </b> "
-description: "Tìm hiểu cách Amazon Cognito tự động đồng bộ dữ liệu xác thực giữa các Region để đảm bảo ứng dụng không bị gián đoạn khi xảy ra sự cố hạ tầng."
 ---
 
-Khi xây dựng ứng dụng trên AWS, chúng ta thường tập trung vào việc mở rộng hệ thống, tối ưu hiệu năng hay bảo mật dữ liệu. Tuy nhiên, có một tình huống ít ai mong muốn nhưng vẫn phải chuẩn bị: **điều gì sẽ xảy ra nếu AWS Region đang vận hành ứng dụng gặp sự cố?**
+## Theo Dõi Và Quản Lý Chi Phí Claude Code Trên Amazon Bedrock: Giải Pháp Toàn Diện Cho Developer
+Sử dụng AI trong lập trình đang là xu hướng không thể đảo ngược, và Claude Code kết hợp với Amazon Bedrock là một trong những công cụ mạnh mẽ nhất hiện nay. Tuy nhiên, khi triển khai công cụ này cho cả một đội ngũ, các nhà quản lý và kỹ sư hệ thống thường đối mặt với một câu hỏi hóc búa: Làm sao để theo dõi mức độ sử dụng, kiểm soát chi phí và đo lường hiệu suất sinh code thực tế?
 
-Nếu dịch vụ xác thực ngừng hoạt động, người dùng sẽ không thể đăng nhập, các API được bảo vệ bằng OAuth có thể ngừng phản hồi và nhiều dịch vụ phía sau cũng bị ảnh hưởng. Đây là lý do các hệ thống quan trọng thường phải có chiến lược dự phòng giữa nhiều Region.
+May mắn thay, AWS đã cung cấp một giải pháp giám sát (Monitoring) tích hợp sẵn thông qua OpenTelemetry (OTEL) và CloudWatch. Hãy cùng khám phá kiến trúc đằng sau hệ thống này để xem bạn có thể tận dụng nó như thế nào.
 
-Để đơn giản hóa bài toán này, AWS đã giới thiệu **Multi-Region Replication cho Amazon Cognito**. Tính năng này giúp tự động đồng bộ dữ liệu xác thực giữa nhiều Region, giảm đáng kể công sức xây dựng cơ chế dự phòng và tăng khả năng sẵn sàng (High Availability) của hệ thống.
+## 1. Hai Lựa Chọn Kiến Trúc Giám Sát: Sidecar vs. Central
 
----
+Tùy thuộc vào quy mô đội dự án và ngân sách, bạn có thể chọn triển khai hệ thống thu thập dữ liệu (Collector) theo một trong hai mô hình sau:
 
-## Tại sao tính năng này lại cần thiết?
+### Mô hình Sidecar (Tiết kiệm & Gọn nhẹ)
 
-Trước đây, mỗi Amazon Cognito User Pool chỉ hoạt động trong một Region duy nhất. Nếu muốn triển khai kiến trúc đa Region, đội ngũ phát triển thường phải tự xây dựng:
-* Quy trình sao chép dữ liệu người dùng thủ công.
-* Cơ chế đồng bộ cấu hình giữa các bên.
-* Xử lý nhiều tình huống phức tạp khi chuyển đổi (Failover) sang Region dự phòng.
+Nếu bạn muốn một giải pháp theo dõi không tốn phí duy trì server (khoảng $0/tháng cho hạ tầng), Sidecar là chân ái.
 
-Quá trình này không chỉ tốn thời gian mà còn tiềm ẩn nhiều rủi ro như dữ liệu không đồng bộ, người dùng phải đăng nhập lại hoặc các ứng dụng Machine-to-Machine phải cấu hình lại OAuth Client. Đó là khoảng trống lớn mà Multi-Region Replication hướng đến giải quyết.
+- Cách hoạt động: Một ứng dụng rất nhẹ bằng Go (tên là otel-helper, chỉ khoảng 15-20MB) sẽ chạy ngầm ngay trên máy tính của từng lập trình viên.
+- Ưu điểm: Mỗi client sẽ gửi số liệu trực tiếp lên CloudWatch OTLP endpoint thông qua xác thực SigV4. Hệ thống hoàn toàn không cần thiết lập VPC, Load Balancer hay ECS Fargate.
 
----
+### Mô hình Central (Tập trung & Dành cho Enterprise)
 
-## Multi-Region Replication hoạt động như thế nào?
+Nếu công ty bạn cần lưu trữ dữ liệu lịch sử lâu dài để truy vấn SQL phân tích, mô hình Central là bắt buộc.
 
-Tính năng này cho phép Cognito tự động đồng bộ dữ liệu từ Region chính (Primary) sang Region dự phòng (Secondary).
+- Cách hoạt động: Dữ liệu từ các máy client sẽ gửi về một máy chủ trung tâm (chạy ECS Fargate) đặt sau một Application Load Balancer (ALB).
+- Chi phí: Nhỉnh hơn một chút, rơi vào khoảng $30–$50/tháng cho các tài nguyên AWS.
+- Sức mạnh: Cho phép kích hoạt luồng xử lý phân tích dữ liệu chuyên sâu với Athena (sẽ đề cập ở phần sau).
 
-### Các thành phần được sao chép bao gồm:
-* Hồ sơ người dùng (User Profiles).
-* Thông tin đăng nhập (Credentials).
-* Cấu hình User Pool.
-* Dữ liệu phục vụ xác thực Machine-to-Machine.
+![alt text](../../../images/3-BlogsPosted/3.1-Blog1/image1.png)
 
-Region dự phòng chỉ phục vụ việc xác thực và luôn được cập nhật liên tục từ Region chính. Khi xảy ra sự cố, doanh nghiệp chỉ cần chuyển hướng lưu lượng truy cập sang Region còn hoạt động mà không phải xây dựng thêm quy trình đồng bộ riêng.
-> **Trải nghiệm liền mạch:** Điều mình đánh giá cao là người dùng cuối hầu như không cảm nhận được sự thay đổi. Họ vẫn sử dụng tài khoản hiện có để đăng nhập bình thường thay vì phải tạo tài khoản mới hoặc đặt lại mật khẩu.
+## 2. Hệ Thống Đang Lắng Nghe Những Gì?
 
----
+Không chỉ là các con số khô khan, hệ thống này gửi về các dữ liệu rất thực tế phản ánh hành vi và hiệu suất của developer:
 
-## Không chỉ dành cho đăng nhập thông thường
+- Mức tiêu thụ & Chi phí: Theo dõi sát sao số lượng Token (input/output/cache) và ước tính chi phí AWS theo thời gian thực (metrics token.usage, cost.usage).
+- Hiệu suất lập trình: Ghi nhận số lượng dòng code được thêm/xóa (lines_of_code.count), số lượt commit và Pull Request (pull_request.count).
+- Hành vi sử dụng AI: Tool AI đang đưa ra các quyết định chỉnh sửa code nào? Thời gian developer thực sự "active" làm việc với AI là bao lâu?
 
-Multi-Region Replication vẫn hỗ trợ đầy đủ các phương thức xác thực mạnh mẽ mà Cognito đang cung cấp:
+Tất cả những thông số này được gắn thẻ (tag) chi tiết theo từng user (user.email), loại model AI đang dùng và thậm chí là phòng ban (department/team) nếu bạn sử dụng xác thực OIDC.
 
-* **Social Login:** Đăng nhập bằng Google, Apple, hoặc Facebook.
-* **Enterprise:** SAML và OpenID Connect (OIDC).
-* **M2M:** OAuth cho các kết nối Machine-to-Machine.
+![alt text](../../../images/3-BlogsPosted/3.1-Blog1/image2.png)
 
-Điều này giúp các hệ thống đang sử dụng nhiều hình thức đăng nhập phức tạp vẫn có thể triển khai mô hình đa Region mà không cần thay đổi quá nhiều kiến trúc hiện tại.
+## 3. Dashboard Trực Quan Với PromQL
 
----
+Mọi dữ liệu thu thập được sẽ đổ về CloudWatch Dashboards. Nhờ sức mạnh của ngôn ngữ truy vấn PromQL, bạn sẽ có ngay một bảng điều khiển cực kỳ xịn sò với các biểu đồ:
 
-## Bảo mật dữ liệu với Customer Managed Key (CMK)
+- Tổng quan số lượng người dùng đang active và tỷ lệ Cache hit rate (giúp tiết kiệm tiền API).
+- Biểu đồ chi phí và token phân bổ theo từng user hoặc từng team.
+- Phân tích hiệu suất sinh code theo từng ngôn ngữ lập trình.
 
-Song song với tính năng Replication, AWS cũng bổ sung khả năng sử dụng **Customer Managed Key (CMK)** thông qua AWS KMS.
+![alt text](../../../images/3-BlogsPosted/3.1-Blog1/image3.png)
 
-Thay vì sử dụng hoàn toàn khóa do AWS quản lý, doanh nghiệp có thể tự kiểm soát và quản lý khóa mã hóa của mình. Đây là lựa chọn cực kỳ phù hợp với các tổ chức có yêu cầu cao về bảo mật hoặc cần đáp ứng các tiêu chuẩn tuân thủ nghiêm ngặt như *PCI DSS*, *HIPAA* hay các quy định khắt khe của nội bộ.
+## 4. Quản Lý Ngân Sách (Quota) - Chống "Đốt Tiền" Vô Ý
 
----
+Giao cho developer một công cụ AI mạnh mẽ mà không giới hạn ngân sách là một rủi ro lớn về chi phí cloud. Giải pháp giám sát này tích hợp sẵn một cơ chế kiểm soát ngân sách rất thông minh:
 
-## Việc triển khai có thực sự "một cú nhấp chuột"?
+- Cứ mỗi 15 phút, một hàm AWS Lambda sẽ chạy ngầm, truy vấn số liệu token từ CloudWatch và cập nhật vào một bảng DynamoDB.
+- Khi một developer sử dụng Claude Code, hệ thống sẽ đối chiếu với giới hạn quota trên DynamoDB để ra quyết định "Cho phép" (Allow) hay "Chặn" (Block) cực kỳ nhanh chóng.
 
-**Không hẳn.** AWS đã đơn giản hóa đáng kể quá trình cấu hình, nhưng vẫn còn một số bước mà đội ngũ kỹ thuật cần chuẩn bị:
+## 5. Mở Khóa Sức Mạnh Phân Tích Lịch Sử Với AWS Athena (Tùy chọn)
 
-1. **Cập nhật Endpoint:** Các ứng dụng sẽ phải cập nhật sang cấu hình Multi-Region OIDC Endpoint mới.
-2. **Tài nguyên đi kèm:** Nếu hệ thống sử dụng *Lambda Trigger, Amazon SES, SNS hoặc AWS WAF* thì những thành phần này vẫn cần được deploy thủ công ở Region dự phòng.
+Dashboards CloudWatch bằng PromQL rất tốt cho real-time, nhưng nó có giới hạn chỉ xem lại được dữ liệu trong 7 ngày.
 
-Nói cách cách khác, Cognito chỉ chịu trách nhiệm đồng bộ phần **Identity (Định danh)**. Những tài nguyên phụ trợ còn lại của ứng dụng vẫn cần được quản lý theo kiến trúc Multi-Region riêng của từng doanh nghiệp.
+Nếu bạn là quản lý cấp cao muốn làm báo cáo theo quý, bạn có thể bật tính năng analytics_enabled=true (chỉ có trên mô hình Central). Lúc này, hệ thống sẽ gửi thêm log dạng EMF (Embedded Metric Format). Dữ liệu này được Kinesis Data Firehose gom lại, chuyển thành định dạng Parquet siêu tối ưu và lưu vào S3.
 
----
+Từ đây, bạn có thể dùng AWS Athena để chạy các câu lệnh SQL phân tích lịch sử làm việc của hàng trăm developer trong nhiều tháng liền một cách dễ dàng.
 
-## Failover vẫn là trách nhiệm của hệ thống
+## Tổng Kết
 
-Một điểm cần lưu ý là **AWS không tự động quyết định** khi nào chuyển lưu lượng truy cập sang Region dự phòng.
+Dù bạn là một team nhỏ muốn dùng mô hình Sidecar miễn phí để xem nhanh số liệu, hay một doanh nghiệp cần mô hình Central với Kinesis & Athena để quản lý hàng nghìn developer, kiến trúc giám sát này của AWS đều có thể đáp ứng. Bằng cách thiết lập hệ thống telemetry này, bạn không chỉ kiểm soát được chi phí hạ tầng mà còn đo lường được xem AI thực sự đang mang lại bao nhiêu giá trị cho dự án của mình.
 
-Doanh nghiệp vẫn cần chủ động triển khai:
-* Hệ thống Giám sát (Monitoring) & Cảnh báo (Alerting).
-* Cấu hình Health Check để theo dõi tình trạng dịch vụ.
-* Sử dụng **Amazon Route 53** để điều hướng/chuyển hướng lưu lượng (DNS Failover) khi phát hiện sự cố ở Region chính.
-Tuy nhiên, nhờ dữ liệu xác thực đã được đồng bộ sẵn sàng ở Region dự phòng, quá trình chuyển đổi (RTO/RPO) sẽ diễn ra nhanh hơn rất nhiều và hạn chế tối đa ảnh hưởng đến trải nghiệm người dùng cuối.
+### Link gốc bài viết mọi người có thể tham khảo thêm:
 
----
-
-## Góc nhìn cá nhân
-
-Theo mình, Multi-Region Replication không phải là tính năng mà mọi dự án đều cần ngay từ đầu. Với những ứng dụng nhỏ hoặc chỉ phục vụ trong một khu vực, việc triển khai thêm nhiều Region có thể làm tăng chi phí vận hành mà chưa mang lại nhiều giá trị thực tế.
-
-Tuy nhiên, đối với các hệ thống có yêu cầu nghiêm ngặt về tính sẵn sàng cao (High Availability) như *thương mại điện tử, ngân hàng, nền tảng SaaS* hoặc các hệ thống phục vụ lượng người dùng lớn, đây là một cập nhật cực kỳ đáng giá.
-
-Điều mình thích ở bản cập nhật này là AWS đang đi theo đúng xu hướng những năm gần đây: **Biến các bài toán hạ tầng phức tạp thành những tính năng có sẵn (out-of-the-box)**, giúp các kỹ sư giảm bớt gánh nặng duy trì mã nguồn tự chế để tập trung hoàn toàn vào việc tối ưu sản phẩm và trải nghiệm người dùng.
-
-Nguồn bài viết:https://aws.amazon.com/vi/blogs/aws/improve-your-application-resilience-with-amazon-cognito-multi-region-replication/
+- [AWS Solutions Library: Monitoring Claude Code with Amazon Bedrock](https://github.com/aws-solutions-library-samples/guidance-for-claude-code-with-amazon-bedrock/blob/main/assets/docs/MONITORING.md)
+- [AWS Bedrock Generative AI Application Architecture | AWS Builder Center](https://builder.aws.com/content/2f2d59922DQNz3iH1pCTeudpmhv/aws-bedrock-generative-ai-application-architecture)
+- [Managing AWS Distro for OpenTelemetry Collector | AWS Open Source Blog](https://aws.amazon.com/vi/blogs/opensource/managing-aws-distro-for-opentelemetry-collector-with-aws-systems-manager-distributor/)
+- [Getting started with CloudWatch automatic dashboards - Amazon CloudWatch](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/GettingStarted.html)

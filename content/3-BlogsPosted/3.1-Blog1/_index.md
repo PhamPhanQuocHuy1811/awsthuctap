@@ -1,96 +1,81 @@
 ---
 title: "Blog 1"
-date: 2026-07-10
+date: 2024-01-01
 weight: 1
 chapter: false
 pre: " <b> 3.1. </b> "
-description: "Learn how Amazon Cognito automatically synchronizes authentication data across multiple regions to ensure application continuity during infrastructure outrages."
 ---
 
-When building applications on AWS, we often focus on scaling systems, optimizing performance, or securing data. However, there is an undesirable yet inevitable scenario we must prepare for: **What happens if the AWS Region running our application goes down?**
+## Monitoring and Managing Claude Code Costs on Amazon Bedrock: A Comprehensive Guide for Developers
+Using AI in programming is an irreversible trend, and Claude Code combined with Amazon Bedrock is one of the most powerful tools available today. However, when deploying this tool for an entire team, managers and system engineers often face a tough question: How do we track usage, control costs, and measure actual code generation performance?
 
-If the authentication service fails, users cannot log in, OAuth-protected APIs stop responding, and downstream services are severely impacted. This is why mission-critical systems require a multi-region disaster recovery strategy.
+Fortunately, AWS provides a built-in monitoring solution through OpenTelemetry (OTEL) and CloudWatch. Let's explore the architecture behind this system to see how you can leverage it.
 
-To simplify this challenge, AWS introduced **Multi-Region Replication for Amazon Cognito**. This feature automates the synchronization of authentication data across regions, significantly reducing the overhead of building custom failover mechanisms and boosting High Availability (HA).
+## 1. Two Monitoring Architecture Options: Sidecar vs. Central
 
----
+Depending on your project team size and budget, you can choose to deploy the data collection system (Collector) in one of the following two models:
 
-## Why Is This Feature Necessary?
+### Sidecar Model (Economical & Lightweight)
 
-Previously, an Amazon Cognito User Pool was strictly confined to a single Region. To implement a multi-region architecture, development teams had to custom-build:
-* Manual user data replication pipelines.
-* Configuration synchronization workflows.
-* Complex failover handling mechanisms when switching to the secondary region.
+If you want a monitoring solution with no server maintenance costs (around $0/month for infrastructure), Sidecar is the perfect choice.
 
-This process was not only time-consuming but also highly error-prone, carrying risks like data inconsistency, forced user re-authentication, or the need to reconfigure OAuth Clients for Machine-to-Machine applications. Multi-Region Replication directly addresses this gap.
+- How it works: A very lightweight Go application (named otel-helper, only about 15-20MB) runs in the background directly on each developer's machine.
+- Advantages: Each client sends metrics directly to the CloudWatch OTLP endpoint via SigV4 authentication. The system requires absolutely no setup for VPC, Load Balancer, or ECS Fargate.
 
----
+### Central Model (Centralized & For Enterprise)
 
-## How Does Multi-Region Replication Work?
+If your company needs long-term historical data storage for analytical SQL queries, the Central model is mandatory.
 
-This feature enables Cognito to automatically sync data from the Primary Region to the Secondary (replica) Region.
+- How it works: Data from client machines is sent to a central server (running ECS Fargate) placed behind an Application Load Balancer (ALB).
+- Cost: Slightly higher, around $30–$50/month for AWS resources.
+- Power: Enables deep data analysis workflows with Athena (covered in the next section).
 
-### Replicated components include:
-* User Profiles.
-* Credentials (encrypted passwords).
-* User Pool configurations.
-* Machine-to-Machine authentication data.
+![alt text](../../images/3-BlogsPosted/3.1-Blog1/image1.png)
 
-The secondary region remains in a read-ready state, constantly updated by the primary region. In the event of a regional outage, businesses can simply reroute traffic to the healthy region without needing a separate data sync pipeline.
+## 2. What Is The System Listening To?
 
-> **Seamless Experience:** What I appreciate most is that end-users barely notice the transition. They use their existing credentials to log in smoothly, rather than being forced to register new accounts or reset passwords.
+More than just dry numbers, this system sends back highly practical data reflecting developer behavior and performance:
 
----
+- Consumption & Costs: Closely monitors Token volume (input/output/cache) and estimates AWS costs in real-time (metrics token.usage, cost.usage).
+- Programming Performance: Records the number of lines of code added/deleted (lines_of_code.count), the number of commits, and Pull Requests (pull_request.count).
+- AI Usage Behavior: What code editing decisions is the AI tool making? How long is the developer actually "active" working with the AI?
 
-## Beyond Standard User Login
+All these metrics are tagged in detail by user (user.email), the type of AI model being used, and even the department/team if you use OIDC authentication.
 
-Multi-Region Replication fully supports the robust authentication methods that Cognito offers out of the box:
+![alt text](../../images/3-BlogsPosted/3.1-Blog1/image2.png)
 
-* **Social Login:** Sign-in with Google, Apple, or Facebook.
-* **Enterprise Identity:** SAML and OpenID Connect (OIDC).
-* **M2M:** OAuth flows for Machine-to-Machine integrations.
+## 3. Visual Dashboard With PromQL
 
-This allows legacy architectures utilizing complex identity combinations to shift to a multi-region model without heavily rewriting their authentication layer.
----
+All collected data will be pushed to CloudWatch Dashboards. Thanks to the power of the PromQL query language, you will instantly get a sleek dashboard with charts:
 
-## Enhancing Security with Customer Managed Keys (CMK)
+- Overview of active users and Cache hit rate (helping to save API costs).
+- Cost and token distribution charts by user or team.
+- Code generation performance analysis by programming language.
 
-Alongside replication, AWS added support for **Customer Managed Keys (CMK)** via AWS KMS.
+![alt text](../../images/3-BlogsPosted/3.1-Blog1/image3.png)
 
-Instead of relying entirely on AWS-managed keys, enterprises can control and audit their own encryption keys. This is an essential option for organizations with strict security standards or those bound by regulatory compliance such as *PCI DSS*, *HIPAA*, or internal corporate policies.
+## 4. Budget Management (Quota) - Preventing Accidental "Money Burning"
 
----
+Giving developers a powerful AI tool without budget limits is a major cloud cost risk. This monitoring solution integrates a highly intelligent budget control mechanism:
 
-## Is It Truly a "One-Click" Deployment?
+- Every 15 minutes, a background AWS Lambda function runs, queries token metrics from CloudWatch, and updates them into a DynamoDB table.
+- When a developer uses Claude Code, the system quickly checks against the quota limit on DynamoDB to make a swift "Allow" or "Block" decision.
 
-**Not quite.** While AWS has dramatically streamlined the configuration process, engineering teams still need to handle a few prerequisites:
+## 5. Unlocking Historical Analysis Power With AWS Athena (Optional)
 
-1. **Endpoint Updates:** Applications must be updated to use the new Multi-Region OIDC Endpoint.
-2. **Dependent Resources:** If your infrastructure relies on *Lambda Triggers, Amazon SES, SNS, or AWS WAF*, these components must still be manually deployed and configured in the secondary region.
+PromQL CloudWatch Dashboards are great for real-time monitoring, but they are limited to a 7-day data retention period.
 
-In other words, Cognito manages the **Identity** synchronization. The remaining application dependencies still fall under the business's own multi-region architecture design.
+If you are a senior manager who wants to create quarterly reports, you can enable the analytics_enabled=true feature (only available on the Central model). At this point, the system will send additional logs in EMF (Embedded Metric Format). This data is aggregated by Kinesis Data Firehose, converted into highly optimized Parquet format, and stored in S3.
 
----
+From here, you can easily use AWS Athena to run SQL queries analyzing the work history of hundreds of developers over several months.
 
-## Failover Is Still Your Responsibility
+## Conclusion
 
-It is important to note that **AWS does not automatically trigger failover** to the secondary region.
+Whether you are a small team wanting to use the free Sidecar model for quick metrics, or an enterprise needing the Central model with Kinesis & Athena to manage thousands of developers, this AWS monitoring architecture can meet your needs. By setting up this telemetry system, you not only control infrastructure costs but also measure exactly how much value AI is bringing to your project.
 
-Organizations must proactively implement:
-* Comprehensive Monitoring & Alerting systems.
-* Health Checks to track service availability.
-* **Amazon Route 53** configurations to manage traffic redirection (DNS Failover) once an outage is detected in the primary region.
+### Original reference links:
 
-However, since authentication data is already warmed up and waiting in the replica region, Recovery Time Objectives (RTO) and Recovery Point Objectives (RPO) are drastically reduced.
-
----
-
-## Personal Takeaway
-
-In my opinion, Multi-Region Replication isn't a feature that every entry-level project needs right away. For small apps or regional services, maintaining multiple active regions might add unnecessary operational costs without offering immediate returns.
-
-However, for systems requiring strict High Availability—such as *E-commerce platforms, FinTech services, global SaaS products*, or heavy user-traffic applications—this update is a game-changer.
-
-What I love about this release is that AWS is sticking to its recent philosophy: **Turning complex infrastructure bottlenecks into out-of-the-box features.** This relieves engineers from maintaining brittle custom synchronization code, letting them focus entirely on product optimization and end-user experience.
-
-Original Source: https://aws.amazon.com/vi/blogs/aws/improve-your-application-resilience-with-amazon-cognito-multi-region-replication/
+- [AWS Solutions Library: Monitoring Claude Code with Amazon Bedrock](https://github.com/aws-solutions-library-samples/guidance-for-claude-code-with-amazon-bedrock/blob/main/assets/docs/MONITORING.md)
+- [AWS Bedrock Generative AI Application Architecture | AWS Builder Center](https://builder.aws.com/content/2f2d59922DQNz3iH1pCTeudpmhv/aws-bedrock-generative-ai-application-architecture)
+- [Managing AWS Distro for OpenTelemetry Collector | AWS Open Source Blog](https://aws.amazon.com/vi/blogs/opensource/managing-aws-distro-for-opentelemetry-collector-with-aws-systems-manager-distributor/)
+- [Getting started with CloudWatch automatic dashboards - Amazon CloudWatch](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/GettingStarted.html)
