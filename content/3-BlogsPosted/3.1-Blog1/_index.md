@@ -30,7 +30,7 @@ If your company needs long-term historical data storage for analytical SQL queri
 - Cost: Slightly higher, around $30–$50/month for AWS resources.
 - Power: Enables deep data analysis workflows with Athena (covered in the next section).
 
-![alt text](../../images/3-BlogsPosted/3.1-Blog1/image1.png)
+![](image1.png)
 
 ## 2. What Is The System Listening To?
 
@@ -42,7 +42,7 @@ More than just dry numbers, this system sends back highly practical data reflect
 
 All these metrics are tagged in detail by user (user.email), the type of AI model being used, and even the department/team if you use OIDC authentication.
 
-![alt text](../../images/3-BlogsPosted/3.1-Blog1/image2.png)
+![](image2.png)
 
 ## 3. Visual Dashboard With PromQL
 
@@ -52,7 +52,7 @@ All collected data will be pushed to CloudWatch Dashboards. Thanks to the power 
 - Cost and token distribution charts by user or team.
 - Code generation performance analysis by programming language.
 
-![alt text](../../images/3-BlogsPosted/3.1-Blog1/image3.png)
+![](image3.png)
 
 ## 4. Budget Management (Quota) - Preventing Accidental "Money Burning"
 
