@@ -11,7 +11,7 @@ description: "Key takeaways and personal reflections from attending the tech sha
 
 I recently had the opportunity to register and was approved to attend a highly valuable physical workshop at the AWS Vietnam Office:
 
-![AWS Office Attendance Approval Confirmation](/images/4-EventParticipated/aws_office_approval.jpg)
+![AWS Office Attendance Approval Confirmation](/static/images/4-EventParticipated/image1.jpg)
 
 Beyond the dry technical details, this seminar offered practical lessons on career paths, system design thinking, and corporate culture in MNCs. Here are my key personal takeaways.
 
