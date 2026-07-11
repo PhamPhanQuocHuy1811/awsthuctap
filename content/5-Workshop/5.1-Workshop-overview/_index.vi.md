@@ -10,7 +10,7 @@ pre: " <b> 5.1. </b> "
 
 **DaiMarket** là nền tảng marketplace dành cho sản phẩm số như tài liệu PDF/Word và mô hình 3D. Hệ thống cho phép người dùng xem danh sách sản phẩm, xem chi tiết, xem trước mô hình 3D hoặc tài liệu mẫu, mua sản phẩm và truy cập sản phẩm đã mua trong thư viện cá nhân.
 
-<img alt="hosted zone" src="../../../images/5-Workshop/5.1-workshop-overview/project_architecture.png">
+<img alt="hosted zone" src="image.png">
 
 #### Kiến trúc đã triển khai
 

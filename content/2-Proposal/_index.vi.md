@@ -51,7 +51,7 @@ Kiến trúc được thiết kế theo hướng tách lớp rõ ràng: lớp gi
 **Hình 2.1 chưa có** — Sơ đồ kiến trúc hệ thống DaiMarket trên AWS: thể hiện Vercel hoặc CloudFront cho frontend, EC2 backend, RDS PostgreSQL, S3 product assets, IAM Role, CloudWatch và SePay webhook. Tác dụng: cho người đọc thấy toàn cảnh các thành phần hệ thống và luồng dữ liệu giữa chúng.
 {{% /notice %}}
 -->
-![project architecture](../../images/5-Workshop/5.1-workshop-overview/project_architecture.png)
+![project architecture](image.png)
 
 Luồng tổng quát của hệ thống: người dùng truy cập frontend; frontend gọi API qua `/api`; request được chuyển đến backend EC2; backend xử lý nghiệp vụ, truy vấn RDS, upload hoặc stream file từ S3; khi có giao dịch thanh toán, SePay gửi webhook để backend xác nhận và cập nhật trạng thái đơn hàng.
 

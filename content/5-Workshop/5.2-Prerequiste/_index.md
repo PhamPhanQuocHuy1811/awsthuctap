@@ -42,7 +42,7 @@ BANK_ACCOUNT_NAME=<masked>
 #### IAM permission model
 
 The EC2 instance uses an **IAM Role** instead of static AWS access keys. This avoids storing long-term AWS credentials on the server. The role is limited to the `products/` prefix of the selected S3 bucket.
-![iam role gắn vào s3](../../images/5-Workshop/5.2-prerequisite/IAMrole_marketplace-ec2-s3-role.png)
+![iam role gắn vào s3](image1.png)
 ```json
 {
   "Version": "2012-10-17",
@@ -65,6 +65,6 @@ The EC2 instance uses an **IAM Role** instead of static AWS access keys. This av
 ```
 
 * S3 also needs to have Block All Public Access enabled if it's not already.
-![s3 block all public access](../../images/5-Workshop/5.2-prerequisite/block-all-public-access-for-s3.png)
+![s3 block all public access](image2.png)
 <!-- INSERT FIGURE 5.2: Screenshot of EC2 instance Security tab showing IAM Role = marketplace-ec2-s3-role. -->
 <!-- INSERT FIGURE 5.3: Screenshot of S3 bucket with Block all public access enabled. -->

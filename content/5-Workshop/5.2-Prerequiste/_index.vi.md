@@ -42,7 +42,7 @@ BANK_ACCOUNT_NAME=<masked>
 #### Mô hình phân quyền IAM
 
 EC2 sử dụng **IAM Role** thay vì access key tĩnh. Cách này tránh lưu long-term credential trên server. Role chỉ được cấp quyền trong prefix `products/` của bucket đã chọn.
-![iam role gắn vào s3](../../../images/5-Workshop/5.2-prerequisite/IAMrole_marketplace-ec2-s3-role.png)
+![iam role gắn vào s3](image2.png)
 
 ```json
 {
@@ -65,7 +65,7 @@ EC2 sử dụng **IAM Role** thay vì access key tĩnh. Cách này tránh lưu l
 }
 ```
 * S3 cũng cần được bật Block All Public Access nếu chưa bật
-![s3 block all public access](../../../images/5-Workshop/5.2-prerequisite/block-all-public-access-for-s3.png)
+![s3 block all public access](image2.png)
 
 <!-- INSERT FIGURE 5.2: Ảnh tab Security của EC2 hiển thị IAM Role = marketplace-ec2-s3-role. -->
 <!-- INSERT FIGURE 5.3: Ảnh S3 bucket bật Block all public access. -->

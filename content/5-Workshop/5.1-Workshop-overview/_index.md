@@ -10,7 +10,7 @@ pre: " <b> 5.1. </b> "
 
 **DaiMarket** is a marketplace platform for digital assets such as PDF/Word documents and 3D models. The system lets users browse products, view product details, preview 3D models or sample documents, purchase products, and access owned items from a personal library.
 
-<img alt="hosted zone" src="../../images/5-Workshop/5.1-workshop-overview/project_architecture.png">
+<img alt="hosted zone" src="image.png">
 
 #### Implemented architecture
 

@@ -16,7 +16,7 @@ This section describes how the backend is deployed to **Amazon EC2** and connect
 - **Prisma 7** with `@prisma/adapter-pg` is used for database access.
 - The backend exposes `/health`, `/api/auth`, `/api/products`, `/api/categories`, `/api/orders`, `/api/library`, `/api/admin`, `/api/withdrawals`, and `/webhook` routes.
 
-![alt text](../../images/5-Workshop/5.3-backend-deploy-ec2-and-rds/5.3.2-configure-rds-postgresql-prisma/rds-summary.png)
+![](image.png)
 #### Content
 
 - [Create and configure EC2 backend](5.3.1-create-configure-ec2-backend/)

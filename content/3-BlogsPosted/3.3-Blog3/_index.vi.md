@@ -1,5 +1,5 @@
 ---
-title: "Bài đăng blog 3"
+title: "Blog 3"
 date: 2026-07-10
 weight: 3
 chapter: false

@@ -16,7 +16,7 @@ Phần này mô tả cách backend được deploy lên **Amazon EC2** và kết
 - **Prisma 7** với `@prisma/adapter-pg` dùng để truy cập database.
 - Backend expose các route `/health`, `/api/auth`, `/api/products`, `/api/categories`, `/api/orders`, `/api/library`, `/api/admin`, `/api/withdrawals` và `/webhook`.
 
-![alt text](../../../images/5-Workshop/5.3-backend-deploy-ec2-and-rds/5.3.2-configure-rds-postgresql-prisma/rds-summary.png)
+![](image.png)
 #### Nội dung
 
 - [Tạo và cấu hình EC2 backend](5.3.1-create-configure-ec2-backend/)

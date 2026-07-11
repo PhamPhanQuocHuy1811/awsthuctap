@@ -15,9 +15,9 @@ pre: " <b> 5.3.1 </b> "
 - Clone/pull GitHub repository và cài dependency cho backend.
 - Khởi động backend bằng PM2 và lưu startup config.
 
-![alt text](../../../../images/5-Workshop/5.3-backend-deploy-ec2-and-rds/5.3.1-create-configure-ec2-backend/1st-step-create-ec2-Instance-type.png)
-![alt text](../../../../images/5-Workshop/5.3-backend-deploy-ec2-and-rds/5.3.1-create-configure-ec2-backend/2nd-step-create-ec2-add-security-group-rules.png)
-![alt text](../../../../images/5-Workshop/5.3-backend-deploy-ec2-and-rds/5.3.1-create-configure-ec2-backend/successfully-launch-instance.png)
+![](1.png)
+![](2.png)
+![](3.png)
 <!--chèn hình ảnh các bước tạo ec2-->
 
 ```bash
@@ -51,8 +51,8 @@ curl http://localhost:5000/health
 curl http://localhost:5000/api/products
 ```
 * Test pm2 status
-![alt text](../../../../images/5-Workshop/5.3-backend-deploy-ec2-and-rds/5.3.1-create-configure-ec2-backend/pm2-status.png)
+![](4.png)
 * Test pm2 logs
-![alt text](../../../../images/5-Workshop/5.3-backend-deploy-ec2-and-rds/5.3.1-create-configure-ec2-backend/pm2-logs-marketplace-backend.png)
+![](5.png)
 
 <!-- INSERT FIGURE 5.4: Ảnh PM2 status và kết quả /health. Nếu báo cáo public, che public IP. -->

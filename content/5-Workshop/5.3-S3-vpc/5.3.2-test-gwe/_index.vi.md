@@ -45,28 +45,28 @@ psql -h <RDS-ENDPOINT> -U postgres -d marketplace -p 5432 -c 'SELECT id, name, "
 <!-- INSERT FIGURE 5.6: Output psql cho seed data Role và Category. -->
 ### Các bước tạo RDS
 # 1.Engine Settings
-![alt text](../../../../images/5-Workshop/5.3-backend-deploy-ec2-and-rds/5.3.2-configure-rds-postgresql-prisma/1st-step-create-rds-settings-engine.png)
+![](1.png)
 # 2.Availability and durability
-![alt text](../../../../images/5-Workshop/5.3-backend-deploy-ec2-and-rds/5.3.2-configure-rds-postgresql-prisma/2nd-step-rds-create-settings-availability.png)
+![](2.png)
 # 3.Settings
-![alt text](../../../../images/5-Workshop/5.3-backend-deploy-ec2-and-rds/5.3.2-configure-rds-postgresql-prisma/3rd-step-rds-create-settings.png)
+![](3.png)
 # 4.Credentials Settings
-![alt text](../../../../images/5-Workshop/5.3-backend-deploy-ec2-and-rds/5.3.2-configure-rds-postgresql-prisma/4th-step-rds-create-settings-credentials.png)
+![](4.png)
 # 5.Instance Configs
-![alt text](../../../../images/5-Workshop/5.3-backend-deploy-ec2-and-rds/5.3.2-configure-rds-postgresql-prisma/5th-step-rds-create-instance-config.png)
+![](5.png)
 # 6.Storage settings
-![alt text](../../../../images/5-Workshop/5.3-backend-deploy-ec2-and-rds/5.3.2-configure-rds-postgresql-prisma/7th-step-rds-create-storage-and-config.png)
+![](6.png)
 # 7.Connectivity part 1
-![alt text](../../../../images/5-Workshop/5.3-backend-deploy-ec2-and-rds/5.3.2-configure-rds-postgresql-prisma/8th-step-rds-create-connectivity-first-part.png)
+![](7.png)
 # 8.Connectivity part 2
-![alt text](../../../../images/5-Workshop/5.3-backend-deploy-ec2-and-rds/5.3.2-configure-rds-postgresql-prisma/9th-step-rds-create-connectivity-second-part.png)
+![](8.png)
 # 9.Connectivity part 3
-![alt text](../../../../images/5-Workshop/5.3-backend-deploy-ec2-and-rds/5.3.2-configure-rds-postgresql-prisma/10th-step-rds-create-connectivity-third-part.png)
+![](9.png)
 # 10.Monitoring settings
-![alt text](../../../../images/5-Workshop/5.3-backend-deploy-ec2-and-rds/5.3.2-configure-rds-postgresql-prisma/11th-step-rds-create-monitoring.png)
+![](10.png)
 # 11.Additional config part 1
-![alt text](../../../../images/5-Workshop/5.3-backend-deploy-ec2-and-rds/5.3.2-configure-rds-postgresql-prisma/12th-step-rds-create-additionals-config-first-part.png)
+![](11.png)
 # 12.Additional config part 2
-![alt text](../../../../images/5-Workshop/5.3-backend-deploy-ec2-and-rds/5.3.2-configure-rds-postgresql-prisma/13th-step-rds-create-additionals-config-second-part.png)
+![](12.png)
 # 13. Estimated monthly costs
-![alt text](../../../../images/5-Workshop/5.3-backend-deploy-ec2-and-rds/5.3.2-configure-rds-postgresql-prisma/last-of-all-Estimated-monthly-costs.png)
+![](13.png)

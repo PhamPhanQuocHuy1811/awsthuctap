@@ -51,7 +51,7 @@ The architecture is designed with clearly separated layers: the UI layer, API la
 **Figure 2.1 not available yet** — DaiMarket AWS architecture diagram: shows Vercel or CloudFront for the frontend, EC2 backend, RDS PostgreSQL, S3 product assets, IAM Role, CloudWatch, and the SePay webhook. Purpose: gives the reader a full picture of the system components and the data flows between them.
 {{% /notice %}}
 -->
-![project architecture](../images/5-Workshop/5.1-workshop-overview/project_architecture.png)
+![project architecture](image.png)
 
 Overall system flow: users access the frontend; the frontend calls the API via `/api`; requests are forwarded to the EC2 backend; the backend handles business logic, queries RDS, and uploads or streams files from S3; when a payment occurs, SePay sends a webhook so the backend can confirm and update the order status.
 
